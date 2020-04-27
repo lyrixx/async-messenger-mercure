@@ -1,0 +1,21 @@
+version: '3.7'
+
+volumes:
+    builder-data: {}
+
+services:
+    php-base:
+        build: services/php-base
+
+    builder:
+        build: services/builder
+        depends_on:
+            - postgres
+            - rabbitmq
+        environment:
+            - COMPOSER_MEMORY_LIMIT=-1
+        volumes:
+            - "../../${PROJECT_DIRECTORY}:/home/app/application:cached"
+            - application-data:/home/app/application/var/tmp
+            - "~/.composer/cache:/home/app/.composer/cache"
+            - "builder-data:/home/app"

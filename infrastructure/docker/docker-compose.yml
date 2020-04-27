@@ -1,0 +1,59 @@
+version: '3.7'
+
+volumes:
+    postgres-data: {}
+    rabbitmq-data: {}
+    application-data: {}
+
+services:
+    router:
+        build: services/router
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+        network_mode: "host"
+
+    frontend:
+        build: services/frontend
+        depends_on:
+            - postgres
+        volumes:
+            - "../../${PROJECT_DIRECTORY}:/home/app/application:cached"
+            - application-data:/home/app/application/var/tmp
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend.rule=Host(${PROJECT_DOMAINS})"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend.tls=true"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.rule=Host(${PROJECT_DOMAINS})"
+            # Comment the next line to be able to access frontend via HTTP instead of HTTPS
+            - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.middlewares=redirect-to-https@file"
+
+    postgres:
+        build: services/postgres
+        environment:
+            - POSTGRES_USER=app
+            - POSTGRES_PASSWORD=app
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+
+    rabbitmq:
+        image: rabbitmq:3-management-alpine
+        volumes:
+            - rabbitmq-data:/var/lib/rabbitmq
+        environment:
+            - "RABBITMQ_VM_MEMORY_HIGH_WATERMARK=1024MiB"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.${PROJECT_NAME}-rabbitmq.rule=Host(`rabbitmq.${PROJECT_ROOT_DOMAIN}`)"
+            - "traefik.http.routers.${PROJECT_NAME}-rabbitmq.tls=true"
+            - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"
+
+    mercure:
+        image: dunglas/mercure
+        environment:
+            - "JWT_KEY=password"
+            - "ALLOW_ANONYMOUS=1"
+            - "CORS_ALLOWED_ORIGINS=*"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.${PROJECT_NAME}-mercure.rule=Host(`mercure.${PROJECT_ROOT_DOMAIN}`)"
+            - "traefik.http.routers.${PROJECT_NAME}-mercure.tls=true"

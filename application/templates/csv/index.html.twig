@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload a CSV{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-6">
+            <h2>Upload a CSV</h2>
+            {{ form(form) }}
+        </div>
+        <div class="col-6">
+            <h2>Progress</h2>
+            <div class="progress">
+                <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div id="message">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        const url = new URL('https://mercure.async.test/.well-known/mercure');
+        url.searchParams.append('topic', 'csv');
+
+        const eventSource = new EventSource(url);
+
+        const messageElt = document.getElementById('message');
+        const progressElt = document.getElementById('progress');
+
+        eventSource.onmessage = e => {
+            const payload = JSON.parse(e.data)
+            if (payload.type === 'progress') {
+                if (!payload.data.total) {
+                    return
+                }
+                const percentage = (payload.data.current / payload.data.total) * 100 ;
+                progressElt.style = `width: ${percentage}%`;
+            } else if (payload.type === 'message') {
+                messageElt.innerHTML = payload.data;
+            }
+        };
+    </script>
+{% endblock %}

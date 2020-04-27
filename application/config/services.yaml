@@ -1,0 +1,13 @@
+parameters:
+    tmpDir: '%kernel.project_dir%/var/tmp'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            string $tmpDir: '%tmpDir%'
+
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
