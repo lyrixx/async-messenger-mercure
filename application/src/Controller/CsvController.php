@@ -35,15 +35,16 @@ class CsvController extends AbstractController
 
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
             $name = bin2hex(random_bytes(20));
+            $importId = uuid_create();
 
             $file = $form->get('csv')->getData();
             $file->move($this->tmpDir, $name);
 
-            $this->bus->dispatch(new CsvUploaded($name));
+            $this->bus->dispatch(new CsvUploaded($name, $importId));
 
             $this->addFlash('success', 'The file will be imported ASAP.');
 
-            return $this->redirectToRoute('csv');
+            return $this->redirectToRoute('csv', ['importId' => $importId]);
         }
 
         return $this->render('csv/index.html.twig', [

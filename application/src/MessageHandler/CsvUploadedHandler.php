@@ -35,7 +35,7 @@ final class CsvUploadedHandler implements MessageHandlerInterface
 
             $sqlConnection->exec('TRUNCATE first_name_stat');
 
-            $this->doHandle($message->getFilename());
+            $this->doHandle($message->getFilename(), $message->getImportId());
 
             $sqlConnection->commit();
         } catch (\Throwable $e) {
@@ -47,7 +47,7 @@ final class CsvUploadedHandler implements MessageHandlerInterface
         }
     }
 
-    private function doHandle(string $filename)
+    private function doHandle(string $filename, string $importId)
     {
         $filePath = sprintf('%s/%s', $this->tmpDir, $filename);
 
@@ -58,7 +58,7 @@ final class CsvUploadedHandler implements MessageHandlerInterface
         $batchSize = 100;
         $lineCount = $this->countLines($filePath);
 
-        $this->publishProgress('message', sprintf('Import of CSV with %d lines started.', $lineCount));
+        $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines started.', $lineCount));
 
         foreach ($csv as $lineNumber => $data) {
             if (0 === $lineNumber || !$data) {
@@ -79,7 +79,7 @@ final class CsvUploadedHandler implements MessageHandlerInterface
                 $this->em->flush();
                 $this->em->clear();
 
-                $this->publishProgress('progress', [
+                $this->publishProgress($importId, 'progress', [
                     'current' => $lineNumber,
                     'total' => $lineCount,
                 ]);
@@ -89,18 +89,18 @@ final class CsvUploadedHandler implements MessageHandlerInterface
         $this->em->flush();
         $this->em->clear();
 
-        $this->publishProgress('progress', [
+        $this->publishProgress($importId, 'progress', [
             'current' => $lineNumber,
             'total' => $lineCount,
         ]);
 
-        $this->publishProgress('message', sprintf('Import of CSV with %d lines finished.', $lineCount));
+        $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines finished.', $lineCount));
     }
 
-    private function publishProgress(string $type, $data = null)
+    private function publishProgress(string $importId, string $type, $data = null)
     {
         $update = new Update(
-            'csv',
+            "csv:$importId",
             json_encode(['type' => $type, 'data' => $data]),
         );
 

@@ -21,27 +21,29 @@
 
 {% block javascripts %}
     {{ parent() }}
+    {% set importId = app.request.get('importId') %}
+    {% if importId %}
+        <script>
+            const url = new URL('https://mercure.async.test/.well-known/mercure');
+            url.searchParams.append('topic', 'csv:{{ importId }}');
 
-    <script>
-        const url = new URL('https://mercure.async.test/.well-known/mercure');
-        url.searchParams.append('topic', 'csv');
+            const eventSource = new EventSource(url);
 
-        const eventSource = new EventSource(url);
+            const messageElt = document.getElementById('message');
+            const progressElt = document.getElementById('progress');
 
-        const messageElt = document.getElementById('message');
-        const progressElt = document.getElementById('progress');
-
-        eventSource.onmessage = e => {
-            const payload = JSON.parse(e.data)
-            if (payload.type === 'progress') {
-                if (!payload.data.total) {
-                    return
+            eventSource.onmessage = e => {
+                const payload = JSON.parse(e.data)
+                if (payload.type === 'progress') {
+                    if (!payload.data.total) {
+                        return
+                    }
+                    const percentage = (payload.data.current / payload.data.total) * 100 ;
+                    progressElt.style = `width: ${percentage}%`;
+                } else if (payload.type === 'message') {
+                    messageElt.innerHTML = payload.data;
                 }
-                const percentage = (payload.data.current / payload.data.total) * 100 ;
-                progressElt.style = `width: ${percentage}%`;
-            } else if (payload.type === 'message') {
-                messageElt.innerHTML = payload.data;
-            }
-        };
-    </script>
+            };
+        </script>
+    {% endif %}
 {% endblock %}
