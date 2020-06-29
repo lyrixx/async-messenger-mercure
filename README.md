@@ -4,7 +4,7 @@ This project is a demo for a talk I (will) give. If you find this projet,
 **please do not share it** until I remove this sentence 😂. It's about doing
 async task with Messenger, and giving feedback in real time with Mercure
 
-[See the demo](https://github.com/lyrixx/async-messenger-mercure/blob/master/async.gif)
+![See the demo](https://github.com/lyrixx/async-messenger-mercure/blob/master/async.gif)
 
 ## Running the application locally
 
