@@ -22,9 +22,7 @@ class CsvController extends AbstractController
         $this->tmpDir = $tmpDir;
     }
 
-    /**
-     * @Route("/", name="csv")
-     */
+    /** @Route("/", name="csv") */
     public function index(Request $request)
     {
         $form = $this->createFormBuilder()
@@ -34,13 +32,12 @@ class CsvController extends AbstractController
         ;
 
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
-            $name = bin2hex(random_bytes(20));
             $importId = uuid_create();
 
             $file = $form->get('csv')->getData();
-            $file->move($this->tmpDir, $name);
+            $file->move($this->tmpDir, $importId);
 
-            $this->bus->dispatch(new CsvUploaded($name, $importId));
+            $this->bus->dispatch(new CsvUploaded($importId));
 
             $this->addFlash('success', 'The file will be imported ASAP.');
 

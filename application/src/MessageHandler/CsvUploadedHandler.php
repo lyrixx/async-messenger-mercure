@@ -35,7 +35,7 @@ final class CsvUploadedHandler implements MessageHandlerInterface
 
             $sqlConnection->exec('TRUNCATE first_name_stat');
 
-            $this->doHandle($message->getFilename(), $message->getImportId());
+            $this->doHandle($message->getImportId());
 
             $sqlConnection->commit();
         } catch (\Throwable $e) {
@@ -47,9 +47,9 @@ final class CsvUploadedHandler implements MessageHandlerInterface
         }
     }
 
-    private function doHandle(string $filename, string $importId)
+    private function doHandle(string $importId)
     {
-        $filePath = sprintf('%s/%s', $this->tmpDir, $filename);
+        $filePath = sprintf('%s/%s', $this->tmpDir, $importId);
 
         $csv = new \SplFileObject($filePath);
         $csv->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
