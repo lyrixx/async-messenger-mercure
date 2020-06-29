@@ -25,7 +25,7 @@ class CsvController extends AbstractController
     /**
      * @Route("/", name="csv")
      */
-    public function index(Request $request, PublisherInterface $publisher)
+    public function index(Request $request)
     {
         $form = $this->createFormBuilder()
             ->add('csv', FileType::class)
