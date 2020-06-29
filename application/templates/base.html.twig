@@ -15,7 +15,12 @@
                     {{ message }}
                 </div>
             {% endfor %}
-            {% block body %}{% endblock %}
+            <div class="container">
+                <h1 class="mb-5">
+                    Upload Application
+                </h1>
+                {% block body %}{% endblock %}
+            </div>
         </div>
         {% block javascripts %}{% endblock %}
     </body>
