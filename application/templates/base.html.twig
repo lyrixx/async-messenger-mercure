@@ -9,17 +9,33 @@
         {% endblock %}
     </head>
     <body>
-        <div class="container">
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
+        <div class="container mt-1">
+            <div class="row justify-content-md-center">
+                <div class="col-8">
+                    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url('csv_sync') }}">Sync</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url('csv_async', {sendNotification: false}) }}">Async - no-feedback</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url('csv_async', {sendNotification: true}) }}">Async</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    <div class="container">
+                        {% block body %}{% endblock %}
+                    </div>
                 </div>
-            {% endfor %}
-            <div class="container">
-                <h1 class="mb-5">
-                    Upload Application
-                </h1>
-                {% block body %}{% endblock %}
             </div>
         </div>
         {% block javascripts %}{% endblock %}

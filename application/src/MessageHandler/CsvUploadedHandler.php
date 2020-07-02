@@ -17,6 +17,6 @@ final class CsvUploadedHandler implements MessageHandlerInterface
 
     public function __invoke(CsvUploaded $message)
     {
-        $this->csvImporter->importCsv($message->getContent(), $message->getImportId());
+        $this->csvImporter->importCsv($message->getContent(), $message->getImportId(), $message->shouldSendNotification());
     }
 }

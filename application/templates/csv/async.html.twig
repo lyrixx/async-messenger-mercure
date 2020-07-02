@@ -1,28 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Upload a CSV{% endblock %}
+{% block title %}Upload a CSV (async){% endblock %}
 
 {% block body %}
     <div class="row">
         <div class="col-12">
-            <h2>Upload a CSV</h2>
+            <h2>Upload a CSV (async)</h2>
             {{ form(form) }}
         </div>
-        <div class="col-12">
-            <h2>Progress</h2>
-            <div class="progress">
-                <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        {% if sendNotification %}
+            <div class="col-12">
+                <h2>Progress</h2>
+                <div class="progress">
+                    <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div id="message">
+                </div>
             </div>
-            <div id="message">
-            </div>
-        </div>
+        {% endif %}
     </div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {% set importId = app.request.get('importId') %}
-    {% if importId %}
+    {% if sendNotification and importId %}
         <script>
             const url = new URL('https://mercure.async.test/.well-known/mercure');
             url.searchParams.append('topic', 'csv:{{ importId }}');

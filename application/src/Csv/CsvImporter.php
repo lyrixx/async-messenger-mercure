@@ -18,7 +18,7 @@ final class CsvImporter
         $this->mercurePublisher = $mercurePublisher;
     }
 
-    public function importCsv(string $content, string $importId)
+    public function importCsv(string $content, string $importId, bool $sendNotification)
     {
         $sqlConnection = $this->em->getConnection();
 
@@ -31,7 +31,7 @@ final class CsvImporter
 
             $sqlConnection->exec('TRUNCATE first_name_stat');
 
-            $this->doHandle($content, $importId);
+            $this->doHandle($content, $importId, $sendNotification);
 
             $sqlConnection->commit();
         } catch (\Throwable $e) {
@@ -43,7 +43,7 @@ final class CsvImporter
         }
     }
 
-    private function doHandle(string $content, string $importId)
+    private function doHandle(string $content, string $importId, bool $sendNotification)
     {
         $tmpFile = tempnam(sys_get_temp_dir(), "async-csv-$importId-");
         file_put_contents($tmpFile, $content);
@@ -55,7 +55,9 @@ final class CsvImporter
         $batchSize = 100;
         $lineCount = $this->countLines($tmpFile);
 
-        $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines started.', $lineCount));
+        if ($sendNotification) {
+            $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines started.', $lineCount));
+        }
 
         foreach ($csv as $lineNumber => $data) {
             if (0 === $lineNumber || !$data) {
@@ -76,22 +78,26 @@ final class CsvImporter
                 $this->em->flush();
                 $this->em->clear();
 
-                $this->publishProgress($importId, 'progress', [
-                    'current' => $lineNumber,
-                    'total' => $lineCount,
-                ]);
+                if ($sendNotification) {
+                    $this->publishProgress($importId, 'progress', [
+                        'current' => $lineNumber,
+                        'total' => $lineCount,
+                    ]);
+                }
             }
         }
 
         $this->em->flush();
         $this->em->clear();
 
-        $this->publishProgress($importId, 'progress', [
-            'current' => $lineNumber,
-            'total' => $lineCount,
-        ]);
+        if ($sendNotification) {
+            $this->publishProgress($importId, 'progress', [
+                'current' => $lineNumber,
+                'total' => $lineCount,
+            ]);
 
-        $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines finished.', $lineCount));
+            $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines finished.', $lineCount));
+        }
     }
 
     private function publishProgress(string $importId, string $type, $data = null)
