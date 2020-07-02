@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -31,7 +30,6 @@ class CsvController extends AbstractController
 
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
             $importId = uuid_create();
-
             $content = file_get_contents($form->get('csv')->getData()->getPathname());
 
             $this->bus->dispatch(new CsvUploaded($importId, $content));
