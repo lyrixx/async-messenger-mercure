@@ -11,13 +11,11 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 final class CsvUploadedHandler implements MessageHandlerInterface
 {
-    private string $tmpDir;
     private EntityManagerInterface $em;
     private PublisherInterface $mercurePublisher;
 
-    public function __construct(string $tmpDir, EntityManagerInterface $em, PublisherInterface $mercurePublisher)
+    public function __construct(EntityManagerInterface $em, PublisherInterface $mercurePublisher)
     {
-        $this->tmpDir = $tmpDir;
         $this->em = $em;
         $this->mercurePublisher = $mercurePublisher;
     }
@@ -35,7 +33,7 @@ final class CsvUploadedHandler implements MessageHandlerInterface
 
             $sqlConnection->exec('TRUNCATE first_name_stat');
 
-            $this->doHandle($message->getImportId());
+            $this->doHandle($message);
 
             $sqlConnection->commit();
         } catch (\Throwable $e) {
@@ -47,16 +45,18 @@ final class CsvUploadedHandler implements MessageHandlerInterface
         }
     }
 
-    private function doHandle(string $importId)
+    private function doHandle(CsvUploaded $message)
     {
-        $filePath = sprintf('%s/%s', $this->tmpDir, $importId);
+        $importId = $message->getImportId();
+        $tmpFile = tempnam(sys_get_temp_dir(), "async-csv-$importId-");
+        file_put_contents($tmpFile, $message->getContent());
 
-        $csv = new \SplFileObject($filePath);
+        $csv = new \SplFileObject($tmpFile);
         $csv->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
         $csv->setCsvControl(';');
 
         $batchSize = 100;
-        $lineCount = $this->countLines($filePath);
+        $lineCount = $this->countLines($tmpFile);
 
         $this->publishProgress($importId, 'message', sprintf('Import of CSV with %d lines started.', $lineCount));
 

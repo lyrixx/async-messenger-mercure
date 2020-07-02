@@ -14,12 +14,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class CsvController extends AbstractController
 {
     private MessageBusInterface $bus;
-    private string $tmpDir;
 
-    public function __construct(MessageBusInterface $bus, string $tmpDir)
+    public function __construct(MessageBusInterface $bus)
     {
         $this->bus = $bus;
-        $this->tmpDir = $tmpDir;
     }
 
     /** @Route("/", name="csv") */
@@ -34,10 +32,9 @@ class CsvController extends AbstractController
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
             $importId = uuid_create();
 
-            $file = $form->get('csv')->getData();
-            $file->move($this->tmpDir, $importId);
+            $content = file_get_contents($form->get('csv')->getData()->getPathname());
 
-            $this->bus->dispatch(new CsvUploaded($importId));
+            $this->bus->dispatch(new CsvUploaded($importId, $content));
 
             $this->addFlash('success', 'The file will be imported ASAP.');
 

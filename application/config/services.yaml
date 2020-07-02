@@ -5,8 +5,6 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
-        bind:
-            string $tmpDir: '%tmpDir%'
 
     App\:
         resource: '../src/*'
