@@ -23,6 +23,9 @@ services:
         build:
             context: services/php
             target: frontend
+        environment:
+            - SERVER_NAME=${PROJECT_ROOT_DOMAIN}
+            - UID=${USER_ID}
         depends_on:
             postgres:
                 condition: service_healthy
@@ -31,13 +34,11 @@ services:
         profiles:
             - default
         labels:
-            - "traefik.enable=true"
             - "project-name=${PROJECT_NAME}"
-            - "traefik.http.routers.${PROJECT_NAME}-frontend.rule=Host(${PROJECT_DOMAINS})"
+            - "traefik.enable=true"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend.rule=Host(`${PROJECT_ROOT_DOMAIN}`)"
             - "traefik.http.routers.${PROJECT_NAME}-frontend.tls=true"
-            - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.rule=Host(${PROJECT_DOMAINS})"
-            # Comment the next line to be able to access frontend via HTTP instead of HTTPS
-            - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.middlewares=redirect-to-https@file"
+            - "traefik.http.services.${PROJECT_NAME}-frontend.loadbalancer.server.port=80"
 
     postgres:
         image: postgres:16

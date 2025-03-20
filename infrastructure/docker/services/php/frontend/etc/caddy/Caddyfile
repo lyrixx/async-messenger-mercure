@@ -1,0 +1,17 @@
+{
+    frankenphp
+    auto_https off
+    debug
+}
+
+http://{$SERVER_NAME}:80 {
+    encode zstd gzip
+
+    root /var/www/public
+    php_server
+
+    log {
+        output stdout
+        format json
+    }
+}
