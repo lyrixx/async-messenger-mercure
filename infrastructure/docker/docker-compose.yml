@@ -1,0 +1,55 @@
+include:
+    - docker-compose.worker.yml
+
+volumes:
+    postgres-data: {}
+
+services:
+    router:
+        build: services/router
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+            - "./services/router/certs:/etc/ssl/certs"
+        ports:
+            - "80:80"
+            - "443:443"
+            - "8080:8080"
+        networks:
+            - default
+        profiles:
+            - default
+
+    frontend:
+        build:
+            context: services/php
+            target: frontend
+        depends_on:
+            postgres:
+                condition: service_healthy
+        volumes:
+            - "../..:/var/www:cached"
+        profiles:
+            - default
+        labels:
+            - "traefik.enable=true"
+            - "project-name=${PROJECT_NAME}"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend.rule=Host(${PROJECT_DOMAINS})"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend.tls=true"
+            - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.rule=Host(${PROJECT_DOMAINS})"
+            # Comment the next line to be able to access frontend via HTTP instead of HTTPS
+            - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.middlewares=redirect-to-https@file"
+
+    postgres:
+        image: postgres:16
+        environment:
+            - POSTGRES_USER=app
+            - POSTGRES_PASSWORD=app
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        profiles:
+            - default
