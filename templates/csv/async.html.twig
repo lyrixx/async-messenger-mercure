@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% if sendNotification %}
+    {% set active = "async-notif" %}
+{% else %}
+    {% set active = "async-no-notif" %}
+{% endif %}
+
+{% set importId = app.request.get('importId') %}
+
+{% block title %}Upload a CSV (async){% endblock %}
+
+{% block body %}
+    <h2>Upload a CSV (async)</h2>
+    {{ form(form) }}
+
+    {% if sendNotification %}
+        <div class="col-12">
+            <h2>Progress</h2>
+            <div class="progress">
+                <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div id="message">
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {% if sendNotification and importId %}
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const eventSource = new EventSource("{{ mercure('csv:' ~ importId) }}");
+
+                const messageElt = document.getElementById('message');
+                const progressElt = document.getElementById('progress');
+
+                eventSource.onmessage = e => {
+                    const payload = JSON.parse(e.data)
+                    if (payload.type === 'progress') {
+                        if (!payload.data.total) {
+                            return
+                        }
+                        const percentage = (payload.data.current / payload.data.total) * 100 ;
+                        progressElt.style = `width: ${percentage}%`;
+                    } else if (payload.type === 'message') {
+                        messageElt.innerHTML = payload.data;
+                    }
+                };
+
+                eventSource.onerror = e => {
+                    console.error(e);
+                    eventSource.close();
+                };
+            });
+        </script>
+    {% endif %}
+{% endblock %}
