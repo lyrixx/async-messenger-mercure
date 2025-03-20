@@ -24,8 +24,12 @@ services:
             context: services/php
             target: frontend
         environment:
-            - SERVER_NAME=${PROJECT_ROOT_DOMAIN}
-            - UID=${USER_ID}
+            SERVER_NAME: ${PROJECT_ROOT_DOMAIN}
+            UID: ${USER_ID}
+            MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+            MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+            MERCURE_URL: http://frontend/.well-known/mercure
+            MERCURE_PUBLIC_URL: https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
         depends_on:
             postgres:
                 condition: service_healthy

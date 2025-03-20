@@ -10,15 +10,13 @@ services:
         depends_on:
             - postgres
         environment:
+            - MERCURE_URL=http://frontend/.well-known/mercure
+            - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+            - MERCURE_PUBLIC_URL=https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
             - PHP_CS_FIXER_IGNORE_ENV=1
             - COMPOSER_MEMORY_LIMIT=-1
-            - UID=${USER_ID}
-            # The following list contains the common environment variables exposed by CI platforms
             - GITHUB_ACTIONS
-            - CI # Travis CI, CircleCI, Cirrus CI, Gitlab CI, Appveyor, CodeShip, dsari
-            - CONTINUOUS_INTEGRATION # Travis CI, Cirrus CI
-            - BUILD_NUMBER # Jenkins, TeamCity
-            - RUN_ID # TaskCluster, dsari
+            - UID=${USER_ID}
         volumes:
             - "builder-data:/home/app"
             - "${COMPOSER_CACHE_DIR}:/home/app/.composer/cache"

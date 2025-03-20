@@ -24,8 +24,8 @@ ENTRYPOINT ["/entrypoint"]
 FROM php-base AS frontend
 
 RUN  setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp && \
-    chown -R ${USER_ID}:${USER_ID} /data/caddy && \
-    chown -R ${USER_ID}:${USER_ID} /config/caddy
+    chown -R ${USER_ID}:${USER_ID} /data && \
+    chown -R ${USER_ID}:${USER_ID} /config
 
 COPY ./frontend/etc/. /etc/
 COPY ./frontend/php.ini $PHP_INI_DIR/conf.d/app-frontend.ini
