@@ -1,4 +1,10 @@
-# My project
+# Async with Messenger & Mercure
+
+[light.webm](https://github.com/user-attachments/assets/a7c46f6b-101b-4a81-9ed2-2ff60af4c92b)
+
+This project is a demo for a talk I'll give at SymfonyLive Paris 2025.
+
+It's all about async processing with Symfony Messenger and Mercure.
 
 ## Running the application locally
 
@@ -29,9 +35,8 @@ may need to use `castor completion > /to/somewhere`.
 ### Docker environment
 
 The Docker infrastructure provides a web stack with:
- - NGINX
+ - FrankenPHP (+Mercure)
  - PostgreSQL
- - PHP
  - Traefik
  - A container with some tooling:
    - Composer
