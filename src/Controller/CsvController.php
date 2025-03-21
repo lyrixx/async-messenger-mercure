@@ -18,7 +18,7 @@ class CsvController extends AbstractController
     #[Route('/', name: 'csv_async')]
     public function async(Request $request, MessageBusInterface $bus): Response
     {
-        $form = $this->getForm();
+        $form = $this->buildCsvForm();
         $sendNotification = $request->query->getBoolean('sendNotification');
 
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
@@ -44,7 +44,7 @@ class CsvController extends AbstractController
     #[Route('/sync', name: 'csv_sync')]
     public function sync(Request $request, CsvImporter $csvImporter): Response
     {
-        $form = $this->getForm();
+        $form = $this->buildCsvForm();
 
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
             $importId = uuid_create();
@@ -64,7 +64,7 @@ class CsvController extends AbstractController
         ]);
     }
 
-    private function getForm(): FormInterface
+    private function buildCsvForm(): FormInterface
     {
         return $this->createFormBuilder()
             ->add('csv', FileType::class)

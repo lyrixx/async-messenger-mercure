@@ -7,14 +7,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Twig\Environment;
 
 final readonly class CsvImporter
 {
     public function __construct(
         private EntityManagerInterface $em,
         private HubInterface $mercurePublisher,
+        private Environment $twig,
+        #[Autowire(service: 'services_resetter')  ]
+        private ServicesResetter $resetter,
         #[Autowire(service: 'monolog.logger.request')]
         private Logger $logger,
         #[Autowire(service: 'deabug.log_processor')]
@@ -48,13 +53,13 @@ final readonly class CsvImporter
 
         $csv = new \SplFileObject($tmpFile);
         $csv->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
-        $csv->setCsvControl(';');
+        $csv->setCsvControl(';', escape: '\\');
 
         $batchSize = 100;
         $lineCount = $this->countLines($tmpFile);
 
         if ($sendNotification) {
-            $this->publishProgress($importId, 'message', \sprintf('Import of CSV with %d lines started.', $lineCount));
+            $this->publishProgress($importId, 0, $lineCount);
         }
 
         foreach ($csv as $lineNumber => $data) {
@@ -80,10 +85,7 @@ final readonly class CsvImporter
                 $this->em->flush();
 
                 if ($sendNotification) {
-                    $this->publishProgress($importId, 'progress', [
-                        'current' => $lineNumber,
-                        'total' => $lineCount,
-                    ]);
+                    $this->publishProgress($importId, $lineNumber, $lineCount);
                 }
 
                 $this->reset();
@@ -94,26 +96,46 @@ final readonly class CsvImporter
         $this->reset();
 
         if ($sendNotification) {
-            $this->publishProgress($importId, 'progress', [
-                'current' => $lineNumber ?? 0,
-                'total' => $lineCount,
-            ]);
-
-            $this->publishProgress($importId, 'message', \sprintf('Import of CSV with %d lines finished.', $lineCount));
+            $this->publishProgress($importId, $lineCount, $lineCount);
         }
     }
 
-    /**
-     * @param string|array{current: int, total: int} $data
-     */
-    private function publishProgress(string $importId, string $type, string|array $data): void
+    private function publishProgress(string $importId, int $current, int $total): void
     {
-        $update = new Update(
-            "csv:{$importId}",
-            json_encode(['type' => $type, 'data' => $data], \JSON_THROW_ON_ERROR),
-        );
+        if ($total <= 0) {
+            return;
+        }
 
-        $this->mercurePublisher->publish($update);
+        // There is a header line
+        --$current;
+        --$total;
+
+        $percent = $current / $total * 100;
+
+        if ($percent < 5) {
+            $catchPhrase = 'Just getting started...';
+        } elseif ($percent < 25) {
+            $catchPhrase = 'We are on our way...';
+        } elseif ($percent < 50) {
+            $catchPhrase = 'Halfway there...';
+        } elseif ($percent < 75) {
+            $catchPhrase = 'Almost done...';
+        } elseif ($percent < 100) {
+            $catchPhrase = 'Just a few more...';
+        } else {
+            $catchPhrase = 'Done!';
+        }
+
+        if (100 !== $percent) {
+            $catchPhrase = "{$catchPhrase} ({$current} / {$total})";
+        }
+
+        $content = $this->twig->load('csv/async.html.twig')->renderBlock('status', [
+            'percent' => $percent,
+            'catch_phrase' => $catchPhrase,
+        ]);
+
+        $this->mercurePublisher->publish(new Update("csv:{$importId}", $content));
     }
 
     private function countLines(string $filePath): int
@@ -134,9 +156,14 @@ final readonly class CsvImporter
 
     // Avoid memory leak in dev
     // Wait for https://github.com/symfony/symfony/pull/60017
+    // Wait for https://github.com/symfony/symfony/pull/60019
     private function reset(): void
     {
         $this->logger->reset();
         $this->processor?->reset();
+        if (\PHP_SAPI !== 'cli') {
+            return;
+        }
+        $this->resetter->reset();
     }
 }

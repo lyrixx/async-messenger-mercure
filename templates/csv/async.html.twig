@@ -14,47 +14,41 @@
     <h2>Upload a CSV (async)</h2>
     {{ form(form) }}
 
-    {% if sendNotification %}
-        <div class="col-12">
-            <h2>Progress</h2>
-            <div class="progress">
-                <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <div id="message">
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-
     {% if sendNotification and importId %}
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const eventSource = new EventSource("{{ mercure('csv:' ~ importId) }}");
+        <div class="col-12" id="status">
+            {{ _self.status(0, 'The import is going to start') }}
+        </div>
 
-                const messageElt = document.getElementById('message');
-                const progressElt = document.getElementById('progress');
-
-                eventSource.onmessage = e => {
-                    const payload = JSON.parse(e.data)
-                    if (payload.type === 'progress') {
-                        if (!payload.data.total) {
-                            return
-                        }
-                        const percentage = (payload.data.current / payload.data.total) * 100 ;
-                        progressElt.style = `width: ${percentage}%`;
-                    } else if (payload.type === 'message') {
-                        messageElt.innerHTML = payload.data;
-                    }
-                };
-
-                eventSource.onerror = e => {
-                    console.error(e);
-                    eventSource.close();
-                };
-            });
-        </script>
+        <div {{ turbo_stream_listen('csv:' ~ importId) }}></div>
     {% endif %}
 {% endblock %}
+
+{% block status %}
+    <turbo-stream action="update" target="status" method="morph" >
+        <template>
+            {{ _self.status(percent, catch_phrase) }}
+        </template>
+    </turbo-stream>
+{% endblock %}
+
+{% macro status(percent, catch_phrase ) %}
+    <h2>Progress</h2>
+
+    {% if percent < 25 %}
+        {% set bg = 'bg-danger' %}
+    {% elseif percent < 50 %}
+        {% set bg = 'bg-warning' %}
+    {% elseif percent < 75 %}
+        {% set bg = 'bg-info' %}
+    {% else %}
+        {% set bg = 'bg-success' %}
+    {% endif %}
+
+    <div class="progress" role="progressbar progress-bar-animated" aria-label="Success example" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar {{ bg }}" style="width: {{ percent }}%"></div>
+    </div>
+
+    <div>
+        {{ catch_phrase }}
+    </div>
+{% endmacro %}
