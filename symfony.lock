@@ -319,5 +319,8 @@
     },
     "twig/extra-bundle": {
         "version": "v3.20.0"
+    },
+    "zenstruck/messenger-monitor-bundle": {
+        "version": "v0.5.1"
     }
 }
