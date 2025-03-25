@@ -9,8 +9,16 @@ x-services-templates:
             - "../..:/var/www:cached"
         profiles:
             - worker
+        healthcheck:
+            test: "cat /proc/1/status"
+            interval: 3s
+            start_period: 1s
 
-# services:
-#    worker_messenger:
-#        <<: *worker_base
-#        command: php -d memory_limit=1G /var/www/bin/console messenger:consume async --memory-limit=128M
+services:
+    worker_messenger:
+        <<: *worker_base
+        command: php -d memory_limit=1G /var/www/bin/console messenger:consume async --memory-limit=128M -vv
+        environment:
+            - MERCURE_URL=http://frontend/.well-known/mercure
+            - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+            - MERCURE_PUBLIC_URL=https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure

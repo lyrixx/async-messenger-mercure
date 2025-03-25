@@ -38,6 +38,8 @@ EXPOSE 80
 
 FROM php-base AS worker
 
+HEALTHCHECK NONE
+
 FROM php-base AS builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]

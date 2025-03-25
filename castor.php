@@ -14,8 +14,8 @@ use function docker\docker_compose_run;
 use function docker\generate_certificates;
 use function docker\up;
 
-// use function docker\workers_start;
-// use function docker\workers_stop;
+use function docker\workers_start;
+use function docker\workers_stop;
 
 guard_min_version('0.18.0');
 
@@ -40,14 +40,14 @@ function start(): void
 {
     io()->title('Starting the stack');
 
-    // workers_stop();
+    workers_stop();
     generate_certificates(force: false);
     build();
     up(profiles: ['default']); // We can't start worker now, they are not installed
     cache_clear();
     install();
     migrate();
-    // workers_start();
+    workers_start();
 
     notify('The stack is now up and running.');
     io()->success('The stack is now up and running.');
