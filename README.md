@@ -2,7 +2,7 @@
 
 [light.webm](https://github.com/user-attachments/assets/a7c46f6b-101b-4a81-9ed2-2ff60af4c92b)
 
-This project is a demo for a talk I'll give at SymfonyLive Paris 2025.
+This project is a demo for [a talk I'll give at SymfonyLive Paris 2025](https://s.lyrixx.info/async).
 
 It's all about async processing with Symfony Messenger and Mercure.
 
