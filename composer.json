@@ -32,7 +32,7 @@
         "symfony/process": "7.2.*",
         "symfony/property-access": "7.2.*",
         "symfony/property-info": "7.2.*",
-        "symfony/runtime": "7.2.*",
+        "symfony/runtime": "7.4.*",
         "symfony/security-bundle": "7.2.*",
         "symfony/serializer": "7.2.*",
         "symfony/stimulus-bundle": "^2.23",
