@@ -5,3 +5,9 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: src/Controller/CsvController.php
+
+		-
+			message: '#^Property App\\Entity\\Article\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Article.php

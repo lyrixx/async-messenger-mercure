@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% if sendNotification %}
-    {% set active = "async-notif" %}
+    {% set active = 'async-notif' %}
 {% else %}
-    {% set active = "async-no-notif" %}
+    {% set active = 'async-no-notif' %}
 {% endif %}
 
-{% set importId = app.request.get('importId') %}
+{% set importId = app.request.query.get('importId') %}
 
 {% block title %}Upload a CSV (async){% endblock %}
 
@@ -31,7 +31,7 @@
     </turbo-stream>
 {% endblock %}
 
-{% macro status(percent, catch_phrase ) %}
+{% macro status(percent, catch_phrase) %}
     <h2>Progress</h2>
 
     {% if percent < 25 %}
