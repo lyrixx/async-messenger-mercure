@@ -2,9 +2,16 @@
 
 {% set active = 'sync' %}
 
-{% block title %}Upload a CSV (sync){% endblock %}
+{% block title %}Sync{% endblock %}
 
 {% block body %}
-    <h2>Upload a CSV (sync)</h2>
+    <div class="text-center py-5">
+        <h1 class="display-5 fw-bold">Sync</h1>
+        <p class="lead col-lg-8 mx-auto text-body-secondary">
+            The CSV is imported during the HTTP request. The browser waits for
+            the whole import to finish before getting a response.
+        </p>
+    </div>
+
     {{ form(form) }}
 {% endblock %}

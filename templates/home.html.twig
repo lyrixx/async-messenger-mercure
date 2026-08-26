@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title 'Async with Messenger & Mercure' %}
+
+{% block body %}
+    <div class="text-center py-5">
+        <h1 class="display-5 fw-bold">Async with Messenger &amp; Mercure</h1>
+        <p class="lead col-lg-8 mx-auto text-body-secondary">
+            Upload a CSV of first names and see how Symfony processes it in the background.
+            Pick a mode below to compare synchronous processing, async processing without
+            feedback, and real-time progress pushed with Mercure.
+        </p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h2 class="h4 card-title">Sync</h2>
+                    <p class="card-text text-body-secondary">
+                        The CSV is imported during the HTTP request. The browser waits for
+                        the whole import to finish before getting a response.
+                    </p>
+                    <a href="{{ url('csv_sync') }}" class="btn btn-primary mt-auto">Try it</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h2 class="h4 card-title">Async, no feedback</h2>
+                    <p class="card-text text-body-secondary">
+                        The import is dispatched to a background worker. The response is
+                        instant, but you have no clue about the progress.
+                    </p>
+                    <a href="{{ url('csv_async') }}" class="btn btn-primary mt-auto">Try it</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h2 class="h4 card-title">Async, with feedback</h2>
+                    <p class="card-text text-body-secondary">
+                        Same as above, but the worker publishes its progress on Mercure,
+                        and the page is updated in real time thanks to Turbo streams.
+                    </p>
+                    <a href="{{ url('csv_async_feedback') }}" class="btn btn-primary mt-auto">Try it</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 pb-4">
+        <a href="https://github.com/lyrixx/async-messenger-mercure" class="btn btn-outline-secondary" target="_blank" rel="noopener">
+            Demo on GitHub
+        </a>
+        <a href="https://s.lyrixx.info/async" class="btn btn-outline-secondary" target="_blank" rel="noopener">
+            The slides
+        </a>
+    </div>
+{% endblock %}

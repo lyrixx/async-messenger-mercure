@@ -8,14 +8,26 @@
 
 {% set importId = app.request.query.get('importId') %}
 
-{% block title %}Upload a CSV (async){% endblock %}
+{% block title %}{{ sendNotification ? 'Async, with feedback' : 'Async, no feedback' }}{% endblock %}
 
 {% block body %}
-    <h2>Upload a CSV (async)</h2>
+    <div class="text-center py-5">
+        <h1 class="display-5 fw-bold">{{ sendNotification ? 'Async, with feedback' : 'Async, no feedback' }}</h1>
+        <p class="lead col-lg-8 mx-auto text-body-secondary">
+            {% if sendNotification %}
+                Same as async without feedback, but the worker publishes its progress on
+                Mercure, and the page is updated in real time thanks to Turbo streams.
+            {% else %}
+                The import is dispatched to a background worker. The response is
+                instant, but you have no clue about the progress.
+            {% endif %}
+        </p>
+    </div>
+
     {{ form(form) }}
 
     {% if sendNotification and importId %}
-        <div class="col-12" id="status">
+        <div class="col-12 mt-4" id="status">
             {{ _self.status(0, 'The import is going to start') }}
         </div>
 

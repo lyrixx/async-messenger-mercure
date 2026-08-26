@@ -12,7 +12,7 @@ final class CsvControllerTest extends WebTestCase
     {
         $client = self::createClient();
 
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->request('GET', '/async');
 
         self::assertResponseIsSuccessful();
         self::assertCount(1, $crawler->filter('form'));
@@ -23,7 +23,7 @@ final class CsvControllerTest extends WebTestCase
         $client = self::createClient();
         $this->cleanTable($client->getContainer());
 
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->request('GET', '/async');
         $form = $crawler->selectButton('Send')->form();
         $form['form[csv]']->upload(__DIR__ . '/../Fixtures/first-names.csv');
 
@@ -31,7 +31,7 @@ final class CsvControllerTest extends WebTestCase
 
         self::assertResponseRedirects();
         self::assertMatchesRegularExpression(
-            '{^/\?importId=[0-9a-f-]+&sendNotification=0$}i',
+            '{^/async\?importId=[0-9a-f-]+$}i',
             (string) $client->getResponse()->headers->get('Location'),
         );
 
@@ -60,11 +60,11 @@ final class CsvControllerTest extends WebTestCase
         self::assertSame(['ALICE', 'BOB', 'CLAIRE'], $rows);
     }
 
-    public function testAsyncUploadKeepsSendNotificationParameter(): void
+    public function testAsyncWithFeedbackUploadRedirectsToFeedbackRoute(): void
     {
         $client = self::createClient();
 
-        $crawler = $client->request('GET', '/?sendNotification=1');
+        $crawler = $client->request('GET', '/async/feedback');
         $form = $crawler->selectButton('Send')->form();
         $form['form[csv]']->upload(__DIR__ . '/../Fixtures/first-names.csv');
 
@@ -72,7 +72,7 @@ final class CsvControllerTest extends WebTestCase
 
         self::assertResponseRedirects();
         self::assertMatchesRegularExpression(
-            '{^/\?importId=[0-9a-f-]+&sendNotification=1$}i',
+            '{^/async/feedback\?importId=[0-9a-f-]+$}i',
             (string) $client->getResponse()->headers->get('Location'),
         );
     }

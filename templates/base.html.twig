@@ -32,13 +32,24 @@
                             <div class="collapse navbar-collapse" id="navbarNav">
                                 <ul class="navbar-nav">
                                     <li class="nav-item">
-                                        <a class="nav-link {{ active == 'sync' ? 'active' }}" href="{{ url('csv_sync') }}">Sync</a>
+                                        <a class="nav-link {{ active|default('') == '' ? 'active' }}" href="{{ url('app_home') }}">Home</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ active == 'async-no-notif' ? 'active' }}" href="{{ url('csv_async', {sendNotification: false}) }}">Async - no-feedback</a>
+                                        <a class="nav-link {{ active|default('') == 'sync' ? 'active' }}" href="{{ url('csv_sync') }}">Sync</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ active == 'async-notif' ? 'active' }}" href="{{ url('csv_async', {sendNotification: true}) }}">Async</a>
+                                        <a class="nav-link {{ active|default('') == 'async-no-notif' ? 'active' }}" href="{{ url('csv_async') }}">Async - no-feedback</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ active|default('') == 'async-notif' ? 'active' }}" href="{{ url('csv_async_feedback') }}">Async</a>
+                                    </li>
+                                </ul>
+                                <ul class="navbar-nav ms-auto">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="https://github.com/lyrixx/async-messenger-mercure" target="_blank" rel="noopener">GitHub</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="https://s.lyrixx.info/async" target="_blank" rel="noopener">Slides</a>
                                     </li>
                                 </ul>
                             </div>
