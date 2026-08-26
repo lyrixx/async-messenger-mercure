@@ -16,3 +16,7 @@ services:
     frontend:
         healthcheck:
             test: ['CMD', 'true']
+
+    worker_messenger:
+        healthcheck:
+            test: ['CMD', 'true']

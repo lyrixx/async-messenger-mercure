@@ -5,13 +5,14 @@ x-templates:
             context: services/php
             target: worker
         user: "${USER_ID}:${USER_ID}"
-        # Don't use depends_on, it does not work well with docker compose profiles
         environment:
-            MERCURE_URL: http://frontend/.well-known/mercure
-            MERCURE_PUBLIC_URL: https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
-            MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+            - APP_ENV
+            - MERCURE_URL=http://frontend/.well-known/mercure
+            - MERCURE_PUBLIC_URL=https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
+            - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
         volumes:
             - "../..:/var/www:cached"
+        # Don't use depends_on, it does not work well with docker compose profiles
         profiles:
             - worker
 

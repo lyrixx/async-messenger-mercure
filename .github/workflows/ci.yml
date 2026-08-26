@@ -76,4 +76,4 @@ jobs:
                   set -e
                   set -o pipefail
 
-                  curl --fail --insecure --silent -H "Host: async-messenger-mercure.test" https://127.0.0.1 | grep "Upload a CSV"
+                  curl --fail --insecure --silent -H "Host: async-messenger-mercure.test" https://127.0.0.1 | grep "Async with Messenger"
