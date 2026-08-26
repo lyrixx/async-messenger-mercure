@@ -11,34 +11,21 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CsvController extends AbstractController
 {
-    #[Route('/', name: 'csv_async')]
+    #[Route('/async', name: 'csv_async')]
     public function async(Request $request, MessageBusInterface $bus): Response
     {
-        $form = $this->buildCsvForm();
-        $sendNotification = $request->query->getBoolean('sendNotification');
+        return $this->handleAsync($request, $bus, sendNotification: false, routeName: 'csv_async');
+    }
 
-        if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
-            $importId = uuid_create();
-            $content = (string) file_get_contents($form->get('csv')->getData()->getPathname());
-
-            $bus->dispatch(new CsvUploaded($importId, $content, $sendNotification));
-
-            $this->addFlash('success', 'The file will be imported ASAP.');
-
-            return $this->redirectToRoute('csv_async', [
-                'importId' => $importId,
-                'sendNotification' => $sendNotification,
-            ]);
-        }
-
-        return $this->render('csv/async.html.twig', [
-            'form' => $form->createView(),
-            'sendNotification' => $sendNotification,
-        ]);
+    #[Route('/async/feedback', name: 'csv_async_feedback')]
+    public function asyncWithFeedback(Request $request, MessageBusInterface $bus): Response
+    {
+        return $this->handleAsync($request, $bus, sendNotification: true, routeName: 'csv_async_feedback');
     }
 
     #[Route('/sync', name: 'csv_sync')]
@@ -64,10 +51,35 @@ class CsvController extends AbstractController
         ]);
     }
 
+    private function handleAsync(Request $request, MessageBusInterface $bus, bool $sendNotification, string $routeName): Response
+    {
+        $form = $this->buildCsvForm();
+
+        if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
+            $importId = uuid_create();
+            $content = (string) file_get_contents($form->get('csv')->getData()->getPathname());
+
+            $bus->dispatch(new CsvUploaded($importId, $content, $sendNotification));
+
+            $this->addFlash('success', 'The file will be imported ASAP.');
+
+            return $this->redirectToRoute($routeName, [
+                'importId' => $importId,
+            ]);
+        }
+
+        return $this->render('csv/async.html.twig', [
+            'form' => $form->createView(),
+            'sendNotification' => $sendNotification,
+        ]);
+    }
+
     private function buildCsvForm(): FormInterface
     {
         return $this->createFormBuilder()
-            ->add('csv', FileType::class)
+            ->add('csv', FileType::class, [
+                'constraints' => [new NotBlank(message: 'Please upload a CSV file.')],
+            ])
             ->add('send', SubmitType::class)
             ->getForm()
         ;

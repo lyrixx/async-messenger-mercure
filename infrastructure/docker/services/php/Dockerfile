@@ -1,6 +1,6 @@
 # hadolint global ignore=DL3008
 
-FROM dunglas/frankenphp:1.4.4-php8.4-bookworm as php-base
+FROM dunglas/frankenphp:1.12.7-php8.5 AS php-base
 
 RUN install-php-extensions \
         intl \
@@ -10,27 +10,17 @@ RUN install-php-extensions \
 
 COPY ./base/php.ini $PHP_INI_DIR/conf.d/app-base.ini
 
-# Fake user to maps with the one on the host
-ARG USER_ID
-RUN addgroup --gid $USER_ID app && \
-    adduser --system --uid $USER_ID --home /home/app --shell /bin/bash app && \
-    curl -Ls https://github.com/tianon/gosu/releases/download/1.17/gosu-amd64 | \
-        install /dev/stdin /usr/local/bin/gosu
+ENV HOME=/home/app
 
-COPY entrypoint /
-
-ENTRYPOINT ["/entrypoint"]
+WORKDIR /var/www
 
 FROM php-base AS frontend
 
-RUN  setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp && \
-    chown -R ${USER_ID}:${USER_ID} /data && \
-    chown -R ${USER_ID}:${USER_ID} /config
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp && \
+    chmod -R 777 /data /config
 
 COPY ./frontend/etc/. /etc/
 COPY ./frontend/php.ini $PHP_INI_DIR/conf.d/app-frontend.ini
-
-WORKDIR /var/www
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 
@@ -38,19 +28,12 @@ EXPOSE 80
 
 FROM php-base AS worker
 
+# Remove caddy healthcheck inherited from frankenphp image
 HEALTHCHECK NONE
 
 FROM php-base AS builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Default toys
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        gnupg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # Default toys
 RUN apt-get update \
@@ -61,15 +44,15 @@ RUN apt-get update \
         git \
         make \
         procps \
-        sudo \
         unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # Composer
-COPY --from=composer/composer:2.8.4 /usr/bin/composer /usr/bin/composer
+COPY --from=composer/composer:2.10.0 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_MEMORY_LIMIT=-1
 
-ADD https://raw.githubusercontent.com/symfony/symfony/refs/heads/7.2/src/Symfony/Component/Console/Resources/completion.bash /tmp/completion.bash
+ADD https://raw.githubusercontent.com/symfony/symfony/refs/heads/8.1/src/Symfony/Component/Console/Resources/completion.bash /tmp/completion.bash
 
 # Composer symfony/console version is too old, and doest not support "API version feature", so we remove it
 # Hey, while we are at it, let's add some more completion
@@ -85,13 +68,18 @@ RUN sed /tmp/completion.bash \
 
 # Config
 COPY ./builder/php.ini $PHP_INI_DIR/conf.d/app-builder.ini
-COPY builder/etc/. /etc/
-RUN adduser app sudo \
-    && mkdir /var/log/php \
+RUN mkdir /var/log/php \
     && chmod 777 /var/log/php
 
 # Third party tools
 ENV PATH="$PATH:/var/www/tools/bin"
+
+# frankenphp defined the two following vars. But they are located in a folder
+# not owned by the user (/data, and /config). Yarn needs it, and it must be
+# shared between all containers instances! So let's override(reset) them to
+# point to the user home directory (default values)
+ENV XDG_DATA_HOME=
+ENV XDG_CONFIG_HOME=
 
 # Good default customization
 RUN cat >> /etc/bash.bashrc <<EOF
@@ -99,5 +87,3 @@ RUN cat >> /etc/bash.bashrc <<EOF
 
 PS1='\[\e[01;33m\]\u \[\e[00;32m\]\w\[\e[0m\] '
 EOF
-
-WORKDIR /var/www

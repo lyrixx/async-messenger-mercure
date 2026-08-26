@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Twig\Environment;
@@ -18,11 +18,11 @@ final readonly class CsvImporter
         private EntityManagerInterface $em,
         private HubInterface $mercurePublisher,
         private Environment $twig,
-        #[Autowire(service: 'services_resetter')  ]
+        #[Autowire(service: 'services_resetter')]
         private ServicesResetter $resetter,
         #[Autowire(service: 'monolog.logger.request')]
         private Logger $logger,
-        #[Autowire(service: 'deabug.log_processor')]
+        #[Autowire(service: 'debug.log_processor')]
         private ?DebugProcessor $processor = null,
     ) {
     }

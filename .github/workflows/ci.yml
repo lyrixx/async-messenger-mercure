@@ -1,0 +1,79 @@
+name: Continuous Integration
+
+"on":
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+    schedule:
+        - cron: "0 0 * * MON"
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+env:
+    # Fix for symfony/console color detection. We know GitHub Actions can handle it
+    ANSICON: "1"
+    CASTOR_CONTEXT: ci
+
+jobs:
+    check-dockerfiles:
+        name: Check Dockerfile
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+              with:
+                  persist-credentials: false
+
+            - name: Check php/Dockerfile
+              uses: hadolint/hadolint-action@v3.1.0
+              with:
+                  dockerfile: infrastructure/docker/services/php/Dockerfile
+
+    ci:
+        name: Continuous Integration
+        runs-on: ubuntu-latest
+        steps:
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Install Castor
+              uses: castor-php/setup-castor@v1.1.0
+
+            - name: Checkout
+              uses: actions/checkout@v5
+              with:
+                  persist-credentials: false
+
+            - name: "Build and start the infrastructure"
+              run: "castor start"
+
+            - name: "Check Security issues"
+              run: "castor qa:security-audit"
+
+            - name: "Check PHP coding standards"
+              run: "castor qa:cs --dry-run"
+
+            - name: "Run Twig CS"
+              run: "castor qa:twig-cs --dry-run"
+
+            - name: "Run PHPStan"
+              run: |
+                # PHPStan needs the container to be compiled
+                castor builder -- bin/console about --env=dev
+                castor qa:phpstan
+
+            - name: "Run PHPUnit"
+              run: "castor qa:phpunit"
+
+            - name: "Test HTTP server"
+              run: |
+                  set -e
+                  set -o pipefail
+
+                  curl --fail --insecure --silent -H "Host: async-messenger-mercure.test" https://127.0.0.1 | grep "Async with Messenger"

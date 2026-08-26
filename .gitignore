@@ -1,19 +1,21 @@
-
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
-###< symfony/framework-bundle ###
 /.castor.stub.php
 /infrastructure/docker/docker-compose.override.yml
 /infrastructure/docker/services/router/certs/*.pem
 
 # Tools
 .php-cs-fixer.cache
+.twig-cs-fixer.cache
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/reference.php
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
 /phpunit.xml
