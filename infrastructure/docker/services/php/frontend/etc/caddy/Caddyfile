@@ -2,6 +2,11 @@
     frankenphp
     auto_https off
     debug
+
+    log {
+        output stdout
+        format json
+    }
 }
 
 http://{$SERVER_NAME}:80, http://frontend:80 {
@@ -12,7 +17,9 @@ http://{$SERVER_NAME}:80, http://frontend:80 {
 
     mercure {
         # Transport to use (default to Bolt)
-        transport_url {$MERCURE_TRANSPORT_URL:bolt:///data/mercure.db}
+        transport bolt {
+            path /data/mercure.db
+        }
         # Publisher JWT key
         publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
         # Subscriber JWT key
@@ -26,10 +33,5 @@ http://{$SERVER_NAME}:80, http://frontend:80 {
         ui
         # Extra directives
         {$MERCURE_EXTRA_DIRECTIVES}
-    }
-
-    log {
-        output stdout
-        format json
     }
 }
