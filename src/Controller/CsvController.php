@@ -11,11 +11,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[Route('/')]
 class CsvController extends AbstractController
 {
-    #[Route('/', name: 'csv_async')]
+    #[Route(name: 'csv_async')]
     public function async(Request $request, MessageBusInterface $bus): Response
     {
         $form = $this->buildCsvForm();
@@ -67,7 +69,9 @@ class CsvController extends AbstractController
     private function buildCsvForm(): FormInterface
     {
         return $this->createFormBuilder()
-            ->add('csv', FileType::class)
+            ->add('csv', FileType::class, [
+                'constraints' => [new NotBlank(message: 'Please upload a CSV file.')],
+            ])
             ->add('send', SubmitType::class)
             ->getForm()
         ;
