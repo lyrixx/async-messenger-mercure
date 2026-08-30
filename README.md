@@ -4,7 +4,9 @@
 
 This project is a demo for [a talk I'll give at SymfonyLive Paris 2025](https://s.lyrixx.info/async).
 
-It's all about async processing with Symfony Messenger and Mercure.
+It's all about async processing with Symfony Messenger and Mercure: upload a
+CSV file, it gets imported in the background by a Messenger worker, and
+progress is pushed live to the browser through Mercure — no polling involved.
 
 ## Running the application locally
 
@@ -35,13 +37,12 @@ may need to use `castor completion > /to/somewhere`.
 ### Docker environment
 
 The Docker infrastructure provides a web stack with:
- - FrankenPHP (+Mercure)
- - PostgreSQL
- - Traefik
- - A container with some tooling:
-   - Composer
-   - Node
-   - Yarn / NPM
+ - FrankenPHP (service `frontend`), embedding the Mercure hub
+ - A Messenger consumer (`worker_messenger`) processing the async queue
+ - PostgreSQL 16
+ - Traefik, terminating HTTPS
+ - A `builder` container with Composer and the PHP tooling (no Node/Yarn — assets
+   are handled by Symfony AssetMapper)
 
 ### Domain configuration (first time only)
 
@@ -93,14 +94,22 @@ use of the new certificates with `castor up` or `castor start`.
 
 ### Builder
 
-Having some composer, yarn or other modifications to make on the project?
-Start the builder which will give you access to a container with all these
-tools available:
+Having some composer or other modifications to make on the project? Start the
+builder which will give you access to a container with all these tools
+available:
 
 ```bash
 castor builder
 ```
 
-### Other tasks
+### Useful commands
 
-Checkout `castor` to have the list of available tasks.
+```bash
+castor start                   # build + install + up + migrate + start workers
+castor stop                    # stop the stack
+castor logs [--service=...]    # tail logs (frontend, worker_messenger, postgres, ...)
+castor pg                      # psql shell on the app database
+castor qa                      # coding standards + static analysis + tests
+```
+
+Run `castor` with no arguments to list every available task.
