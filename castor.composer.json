@@ -1,0 +1,14 @@
+{
+    "name": "async-messenger-mercure/castor",
+    "description": "Castor commands for project async-messenger-mercure",
+    "type": "castor-project",
+    "authors": [
+        {
+            "name": "Grégoire Pineau",
+            "email": "lyrixx@lyrixx.info"
+        }
+    ],
+    "require": {
+        "playwright-php/playwright": "^1.4"
+    }
+}
