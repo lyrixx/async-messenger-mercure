@@ -1,6 +1,8 @@
 # Async with Messenger & Mercure
 
-[light.webm](https://github.com/user-attachments/assets/a7c46f6b-101b-4a81-9ed2-2ff60af4c92b)
+![Home page](media/home.png)
+
+![Async, with feedback demo](media/demo.gif)
 
 This project is a demo for [a talk I'll give at SymfonyLive Paris 2025](https://s.lyrixx.info/async).
 
@@ -110,6 +112,26 @@ castor stop                    # stop the stack
 castor logs [--service=...]    # tail logs (frontend, worker_messenger, postgres, ...)
 castor pg                      # psql shell on the app database
 castor qa                      # coding standards + static analysis + tests
+castor media                   # regenerate media/home.png, media/demo.webm and media/demo.gif
 ```
 
 Run `castor` with no arguments to list every available task.
+
+### Regenerating the README media
+
+`castor media` drives a real, headless Chromium through the app (via
+[Playwright PHP](https://playwright-php.dev/)) to regenerate `media/home.png`
+and `media/demo.webm`, then converts the video to `media/demo.gif` with
+`ffmpeg` (GitHub only renders an animated GIF inline in a README when
+referenced by a relative path — a committed video file never plays inline).
+It runs on the host, not in the `builder` container (Castor tasks always do —
+that's how `castor` itself works, no change from the rest of the project), so
+it needs its own one-time setup:
+
+ * Node.js 20+ and `ffmpeg` (only for this task — not required to run the app itself)
+ * `castor media:install` — downloads the Chromium browser (and, on a fresh
+   machine, its OS dependencies via `--with-deps`, which needs `sudo`). This
+   also transparently installs Playwright PHP itself, as a Castor-only
+   dependency (`castor.composer.json`, separate from the app's `composer.json`).
+
+Then, with the stack running (`castor start`), just run `castor media`.
