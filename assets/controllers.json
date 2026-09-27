@@ -2,11 +2,14 @@
     "controllers": {
         "@symfony/ux-turbo": {
             "turbo-core": {
-                "enabled": false,
-                "fetch": "eager"
+                "enabled": true,
+                "fetch": "eager",
+                "autoimport": {
+                    "@symfony/ux-turbo/dist/mercure_stream_source_element.js": true
+                }
             },
             "mercure-turbo-stream": {
-                "enabled": true,
+                "enabled": false,
                 "fetch": "eager"
             }
         }

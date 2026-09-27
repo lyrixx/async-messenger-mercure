@@ -31,7 +31,7 @@
             {{ _self.status(0, 'The import is going to start') }}
         </div>
 
-        <div {{ turbo_stream_listen('csv:' ~ importId) }}></div>
+        {{ turbo_stream_from('csv:' ~ importId) }}
     {% endif %}
 {% endblock %}
 
