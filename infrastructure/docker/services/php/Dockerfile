@@ -81,9 +81,11 @@ ENV PATH="$PATH:/var/www/tools/bin"
 ENV XDG_DATA_HOME=
 ENV XDG_CONFIG_HOME=
 
-# Good default customization
-RUN cat >> /etc/bash.bashrc <<EOF
+# We can't rely on \u: the container runs as the host's raw UID, which has no
+# /etc/passwd entry, so bash would print "I have no name!" instead. Show
+# "builder" normally, and "root" once elevated.
+RUN cat >> /etc/bash.bashrc <<'EOF'
 . /etc/bash_completion
 
-PS1='\[\e[01;33m\]\u \[\e[00;32m\]\w\[\e[0m\] '
+PS1='\[\e[01;33m\]$([ "$EUID" = 0 ] && echo root || echo builder) \[\e[00;32m\]\w\[\e[0m\] '
 EOF

@@ -23,6 +23,7 @@ castor app:install                           # composer install + importmap:inst
 castor app:db:migrate                        # Doctrine migrations (alias: castor migrate)
 castor app:db:fixtures                       # fixtures (alias: castor fixtures)
 castor postgres                              # psql shell on the app database (alias: castor pg)
+castor postgres -- select 1 from foobar      # one-off command database query
 ```
 
 Docker / workers:
