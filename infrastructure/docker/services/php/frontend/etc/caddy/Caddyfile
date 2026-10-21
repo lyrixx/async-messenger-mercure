@@ -35,8 +35,8 @@ http://{$SERVER_NAME}:80, http://frontend:80 {
         anonymous
         # Enable the subscription API (double-check that it's what you want)
         subscriptions
-        # Only in dev!
-        playground
+        # Debug UI, at /.well-known/mercure/debug/
+        debugger
         # Extra directives
         {$MERCURE_EXTRA_DIRECTIVES}
     }
