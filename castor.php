@@ -17,7 +17,7 @@ use function docker\workers_stop;
 
 defined('CASTOR_USE_CHDIR') || define('CASTOR_USE_CHDIR', true);
 
-guard_min_version('1.8.0');
+guard_min_version('1.9.0');
 
 import(__DIR__ . '/.castor');
 
