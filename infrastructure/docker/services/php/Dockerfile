@@ -1,6 +1,6 @@
 # hadolint global ignore=DL3008
 
-FROM dunglas/frankenphp:1.13.0-php8.5 AS php-base
+FROM dunglas/frankenphp:1.13.1-php8.5.12 AS php-base
 
 RUN install-php-extensions \
         intl \
