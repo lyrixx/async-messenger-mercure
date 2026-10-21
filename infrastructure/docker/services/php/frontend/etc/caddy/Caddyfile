@@ -20,17 +20,23 @@ http://{$SERVER_NAME}:80, http://frontend:80 {
         transport bolt {
             path /data/mercure.db
         }
-        # Publisher JWT key
-        publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
-        # Subscriber JWT key
-        subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+        # Trusted issuer: access tokens must carry it in their iss claim
+        issuer {$MERCURE_JWT_ISSUER} {
+            # Publisher JWT key
+            publisher {
+                jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
+            }
+            # Subscriber JWT key
+            subscriber {
+                jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+            }
+        }
         # Allow anonymous subscribers (double-check that it's what you want)
         anonymous
         # Enable the subscription API (double-check that it's what you want)
         subscriptions
-        # Only in dev!
-        demo
-        ui
+        # Debug UI, at /.well-known/mercure/debug/
+        debugger
         # Extra directives
         {$MERCURE_EXTRA_DIRECTIVES}
     }

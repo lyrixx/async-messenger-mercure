@@ -6,3 +6,7 @@ mercure:
             jwt:
                 secret: '%env(MERCURE_PUBLISHER_JWT_KEY)%'
                 publish: '*'
+                claims:
+                    iss: '%env(MERCURE_JWT_ISSUER)%'
+                    sub: 'app'
+                    client_id: 'app'
