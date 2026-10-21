@@ -10,6 +10,7 @@ x-templates:
             - MERCURE_URL=http://frontend/.well-known/mercure
             - MERCURE_PUBLIC_URL=https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
             - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+            - MERCURE_JWT_ISSUER=https://${PROJECT_ROOT_DOMAIN}
         volumes:
             - "../..:/var/www:cached"
         # Don't use depends_on, it does not work well with docker compose profiles
@@ -46,6 +47,7 @@ services:
             MERCURE_PUBLIC_URL: https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
             MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
             MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+            MERCURE_JWT_ISSUER: https://${PROJECT_ROOT_DOMAIN}
         volumes:
             - "../..:/var/www:cached"
             - "../../.home:/home/app:cached"
@@ -79,6 +81,7 @@ services:
             - MERCURE_URL=http://frontend/.well-known/mercure
             - MERCURE_PUBLIC_URL=https://${PROJECT_ROOT_DOMAIN}/.well-known/mercure
             - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+            - MERCURE_JWT_ISSUER=https://${PROJECT_ROOT_DOMAIN}
             - PHP_CS_FIXER_IGNORE_ENV=1
             - GITHUB_ACTIONS
             - CI # Travis CI, CircleCI, Cirrus CI, Gitlab CI, Appveyor, CodeShip, dsari
