@@ -11,7 +11,7 @@
         "doctrine/doctrine-bundle": "^3.3",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.3",
-        "phpdocumentor/reflection-docblock": "^5.6",
+        "phpdocumentor/reflection-docblock": "^6.0",
         "phpstan/phpdoc-parser": "^2.1",
         "symfony/asset": "8.1.*",
         "symfony/asset-mapper": "8.1.*",
