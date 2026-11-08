@@ -1,0 +1,36 @@
+{% set route = app.request.attributes.get('_route', '') %}
+<nav class="navbar navbar-expand-lg mm-navbar sticky-top">
+    <div class="container-xl">
+        <a class="navbar-brand" href="{{ path('app_home') }}">
+            <img src="{{ asset('images/logo.svg') }}" alt="" width="26" height="26">
+            <span>Messenger <span class="mm-times">×</span> Mercure</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {{ route == 'csv_sync' ? 'active' }}" href="{{ path('csv_sync') }}">Sync</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ route == 'csv_async' ? 'active' }}" href="{{ path('csv_async') }}">Async, no feedback</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ route == 'csv_async_feedback' ? 'active' }}" href="{{ path('csv_async_feedback') }}">
+                        <span class="mm-pulse" aria-hidden="true"></span>
+                        Async, with feedback
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/lyrixx/async-messenger-mercure" target="_blank" rel="noopener">GitHub</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://s.lyrixx.info/async" target="_blank" rel="noopener">Slides</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

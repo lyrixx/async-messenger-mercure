@@ -1,38 +1,91 @@
 {% extends 'base.html.twig' %}
 
-{% if sendNotification %}
-    {% set active = 'async-notif' %}
-{% else %}
-    {% set active = 'async-no-notif' %}
-{% endif %}
-
 {% set importId = app.request.query.get('importId') %}
+{% set title = sendNotification ? 'Async, with feedback' : 'Async, no feedback' %}
 
-{% block title %}{{ sendNotification ? 'Async, with feedback' : 'Async, no feedback' }}{% endblock %}
+{% block title %}{{ title }} · {{ parent() }}{% endblock %}
+
+{% block band %}
+    {% if sendNotification %}
+        {{ include('csv/_band.html.twig', {
+            caption: 'Instant response, then a live stream.',
+            kicker: 'POST /async/feedback · real time',
+            lane: 'live',
+            lead: 'Same as async without feedback, but the worker publishes its progress on Mercure, and the page is updated in real time thanks to Turbo streams.',
+            traits: [
+                {pro: true, text: 'The response is instant.'},
+                {pro: true, text: 'Progress is pushed over Server-Sent Events: no polling.'},
+                {pro: true, text: 'Publishing is a plain HTTP POST to the hub.'},
+            ],
+        }) }}
+    {% else %}
+        {{ include('csv/_band.html.twig', {
+            caption: 'Instant response, then silence.',
+            kicker: 'POST /async · fire and forget',
+            lane: 'blind',
+            lead: 'The import is dispatched to a background worker. The response is instant, but you have no clue about the progress.',
+            traits: [
+                {pro: true, text: 'The response is instant.'},
+                {pro: true, text: 'The import survives the end of the request.'},
+                {pro: false, text: 'The user has no idea of what is happening.'},
+            ],
+        }) }}
+    {% endif %}
+{% endblock %}
 
 {% block body %}
-    <div class="text-center py-5">
-        <h1 class="display-5 fw-bold">{{ sendNotification ? 'Async, with feedback' : 'Async, no feedback' }}</h1>
-        <p class="lead col-lg-8 mx-auto text-body-secondary">
-            {% if sendNotification %}
-                Same as async without feedback, but the worker publishes its progress on
-                Mercure, and the page is updated in real time thanks to Turbo streams.
-            {% else %}
-                The import is dispatched to a background worker. The response is
-                instant, but you have no clue about the progress.
-            {% endif %}
-        </p>
-    </div>
-
-    {{ form(form) }}
-
-    {% if sendNotification and importId %}
-        <div class="col-12 mt-4" id="status">
-            {{ _self.status(0, 'The import is going to start') }}
+    <div class="row g-4">
+        <div class="col-lg-5">
+            {{ include('csv/_upload_form.html.twig') }}
         </div>
+        <div class="col-lg-7">
+            {% if sendNotification and importId %}
+                <section class="mm-panel" {{ stimulus_controller('event-log')|stimulus_action('event-log', 'record', 'turbo:before-stream-render@document') }}>
+                    <header class="mm-panel-bar">
+                        <code class="text-truncate">csv:{{ importId }}</code>
+                        <span class="mm-chip mm-chip-connecting">Connecting to the hub…</span>
+                        <span class="mm-chip mm-chip-connected"><span class="mm-pulse" aria-hidden="true"></span>Subscribed</span>
+                    </header>
+                    <div class="mm-panel-body" id="status">
+                        {{ _self.status(0, 'The import is going to start') }}
+                    </div>
+                    <header class="mm-panel-bar">
+                        <span>EventSource</span>
+                        <span><span {{ stimulus_target('event-log', 'count') }}>0</span> events received</span>
+                    </header>
+                    <ol class="mm-log" {{ stimulus_target('event-log', 'list') }}></ol>
+                    <template {{ stimulus_target('event-log', 'line') }}>
+                        <li><time></time><span class="mm-log-action"></span><span class="mm-log-data"></span></li>
+                    </template>
 
-        {{ turbo_stream_from('csv:' ~ importId) }}
-    {% endif %}
+                    {{ turbo_stream_from('csv:' ~ importId) }}
+                </section>
+            {% elseif sendNotification %}
+                <section class="mm-panel">
+                    <header class="mm-panel-bar">
+                        <span>Mercure</span>
+                        <span class="mm-chip">No topic yet</span>
+                    </header>
+                    <p class="mm-panel-body mm-panel-empty">Upload a CSV to open a stream and watch the worker report its progress.</p>
+                </section>
+            {% else %}
+                <section class="mm-panel">
+                    <header class="mm-panel-bar">
+                        <span>Browser</span>
+                        <span class="mm-chip">No signal</span>
+                    </header>
+                    <div class="mm-panel-body mm-panel-empty">
+                        <div class="mm-flatline" aria-hidden="true"></div>
+                        {% if importId %}
+                            Is it running? Did it fail? Nothing tells you from here.
+                        {% else %}
+                            Nothing dispatched yet. And once it is, you will not hear about it.
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block status %}
@@ -44,23 +97,15 @@
 {% endblock %}
 
 {% macro status(percent, catch_phrase) %}
-    <h2>Progress</h2>
-
-    {% if percent < 25 %}
-        {% set bg = 'bg-danger' %}
-    {% elseif percent < 50 %}
-        {% set bg = 'bg-warning' %}
-    {% elseif percent < 75 %}
-        {% set bg = 'bg-info' %}
-    {% else %}
-        {% set bg = 'bg-success' %}
-    {% endif %}
-
-    <div class="progress" role="progressbar progress-bar-animated" aria-label="Success example" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar {{ bg }}" style="width: {{ percent }}%"></div>
-    </div>
-
-    <div>
-        {{ catch_phrase }}
+    {# Rounded down: 100% must only be displayed once the import is over #}
+    {% set displayed_percent = percent|round(0, 'floor') %}
+    <div class="mm-status {{ percent >= 100 ? 'is-done' }}">
+        <div class="mm-status-head">
+            <span class="mm-status-percent">{{ displayed_percent }}<small>%</small></span>
+            <span class="mm-status-phrase">{{ catch_phrase }}</span>
+        </div>
+        <div class="progress" role="progressbar" aria-label="Import progress" aria-valuenow="{{ displayed_percent }}" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" style="width: {{ percent }}%"></div>
+        </div>
     </div>
 {% endmacro %}

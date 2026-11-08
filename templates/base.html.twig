@@ -1,12 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>
-            {% block title 'Welcome!' %}
+            {% block title 'Async with Messenger & Mercure' %}
         </title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>"> {% block stylesheets %}{% endblock %}
+        {% set description = 'Upload a CSV and compare a synchronous import, an async one, and real-time progress pushed with Mercure.' %}
+        <meta name="description" content="{{ description }}">
+        <meta name="theme-color" content="#050e16">
+        <meta property="og:description" content="{{ description }}">
+        <meta property="og:image" content="{{ absolute_url(asset('images/social-preview.png')) }}">
+        <meta property="og:image:alt" content="Long imports, live progress: a CSV goes from the browser to a Messenger worker, which streams its progress back through the Mercure hub.">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:site_name" content="Async with Messenger &amp; Mercure">
+        <meta property="og:title" content="{{ block('title') }}">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ absolute_url(app.request.pathInfo) }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo.svg') }}">
+        {% block stylesheets %}{% endblock %}
         {% block javascripts %}
             {% block importmap %}
                 {{ importmap('app') }}
@@ -21,50 +36,28 @@
         {% endif %}
     </head>
     <body>
-        <div class="container mt-3">
-            <div class="row justify-content-center">
-                <div class="col-8">
-                    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-3">
-                        <div class="container-fluid">
-                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
-                            <div class="collapse navbar-collapse" id="navbarNav">
-                                <ul class="navbar-nav">
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ active|default('') == '' ? 'active' }}" href="{{ url('app_home') }}">Home</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ active|default('') == 'sync' ? 'active' }}" href="{{ url('csv_sync') }}">Sync</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ active|default('') == 'async-no-notif' ? 'active' }}" href="{{ url('csv_async') }}">Async - no-feedback</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ active|default('') == 'async-notif' ? 'active' }}" href="{{ url('csv_async_feedback') }}">Async</a>
-                                    </li>
-                                </ul>
-                                <ul class="navbar-nav ms-auto">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="https://github.com/lyrixx/async-messenger-mercure" target="_blank" rel="noopener">GitHub</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="https://s.lyrixx.info/async" target="_blank" rel="noopener">Slides</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </nav>
+        {{ include('_navbar.html.twig') }}
 
-                    {% for message in app.flashes('success') %}
-                        <div class="alert alert-success" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+        {% block band %}{% endblock %}
 
-                    {% block body %}{% endblock %}
+        <main class="container-xl py-4 py-lg-5">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
                 </div>
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </main>
+
+        <footer class="mm-footer">
+            <div class="container-xl py-4 d-flex flex-wrap gap-3 justify-content-between">
+                <span>A demo of Symfony Messenger and Mercure. Theme inspired by <a href="https://mercure.rocks" target="_blank" rel="noopener">mercure.rocks</a>.</span>
+                <span>
+                    <a href="https://github.com/lyrixx/async-messenger-mercure" target="_blank" rel="noopener">Source code on GitHub</a>
+                    · <a href="https://s.lyrixx.info/async" target="_blank" rel="noopener">The slides</a>
+                </span>
             </div>
-        </div>
+        </footer>
     </body>
 </html>

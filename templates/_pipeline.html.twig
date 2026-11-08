@@ -1,0 +1,53 @@
+{% set job_path = 'M60,60 H420' %}
+{% set stream_path = 'M420,60 V200 Q420,232 388,232 H92 Q60,232 60,200 V60' %}
+<svg class="mm-pipeline" viewBox="0 0 480 300" role="img" aria-label="An uploaded CSV goes from the browser to Symfony, then to a Messenger worker. The worker publishes its progress to the Mercure hub, which streams it back to the browser.">
+    <path class="edge" d="M112,60 H188" />
+    <path class="edge" d="M292,60 H368" />
+    <path class="edge edge-stream" d="{{ stream_path }}" />
+
+    <text x="150" y="48">POST</text>
+    <text x="330" y="48">dispatch</text>
+    <text x="350" y="220">publish</text>
+    <text x="130" y="220">SSE</text>
+
+    <circle class="token job moving" r="6">
+        <animateMotion dur="8s" repeatCount="indefinite" path="{{ job_path }}" keyPoints="0;1;1" keyTimes="0;.3;1" calcMode="linear" />
+    </circle>
+    <circle class="token job static" cx="150" cy="60" r="6" />
+
+    {% for index in 0..5 %}
+        {% set departure = 0.3 + index * 0.07 %}
+        <circle class="token event moving" r="4">
+            <animateMotion dur="8s" repeatCount="indefinite" path="{{ stream_path }}" keyPoints="0;0;1;1" keyTimes="0;{{ departure }};{{ departure + 0.3 }};1" calcMode="linear" />
+        </circle>
+    {% endfor %}
+    <circle class="token event static" cx="350" cy="232" r="4" />
+    <circle class="token event static" cx="130" cy="232" r="4" />
+
+    {% for delay in ['0s', '1.2s'] %}
+        <circle class="ring moving" cx="240" cy="232" r="36" opacity="0">
+            <animate attributeName="r" from="36" to="64" dur="2.4s" begin="{{ delay }}" repeatCount="indefinite" />
+            <animate attributeName="opacity" from=".7" to="0" dur="2.4s" begin="{{ delay }}" repeatCount="indefinite" />
+        </circle>
+    {% endfor %}
+
+    <rect class="node" x="8" y="28" width="104" height="64" rx="12" />
+    <text class="name" x="60" y="56">Browser</text>
+    <rect class="track" x="28" y="69" width="64" height="6" rx="3" />
+    <rect class="fill moving" x="28" y="69" height="6" rx="3" width="0">
+        <animate attributeName="width" values="0;0;64;64;0" keyTimes="0;.42;.92;.98;1" dur="8s" repeatCount="indefinite" />
+    </rect>
+    <rect class="fill static" x="28" y="69" height="6" rx="3" width="40" />
+
+    <rect class="node" x="188" y="28" width="104" height="64" rx="12" />
+    <text class="name" x="240" y="56">Symfony</text>
+    <text x="240" y="76">controller</text>
+
+    <rect class="node" x="368" y="28" width="104" height="64" rx="12" />
+    <text class="name" x="420" y="56">Worker</text>
+    <text x="420" y="76">Messenger</text>
+
+    <circle class="hub" cx="240" cy="232" r="36" />
+    <text class="name" x="240" y="232">Mercure</text>
+    <text x="240" y="248">hub</text>
+</svg>

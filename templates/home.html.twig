@@ -1,64 +1,108 @@
 {% extends 'base.html.twig' %}
 
-{% block title 'Async with Messenger & Mercure' %}
+{% block band %}
+    <section class="mm-band">
+        <div class="container-xl py-5">
+            <div class="row align-items-center g-4 g-lg-5 py-lg-4">
+                <div class="col-lg-6">
+                    <p class="mm-kicker mb-3">symfony/messenger × mercure · live demo</p>
+                    <h1 class="mm-hero-title mb-4">Long imports, <span class="mm-gradient-text">live</span> progress.</h1>
+                    <p class="lead mb-4">
+                        Upload a CSV of first names and see how Symfony processes it in the background.
+                        Compare a synchronous import, an async one without feedback, and real-time
+                        progress pushed with Mercure.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ path('csv_async_feedback') }}" class="btn btn-accent btn-lg">See it live →</a>
+                        <a href="https://s.lyrixx.info/async" class="btn btn-ghost btn-lg" target="_blank" rel="noopener">The slides</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    {{ include('_pipeline.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
 
 {% block body %}
-    <div class="text-center py-5">
-        <h1 class="display-5 fw-bold">Async with Messenger &amp; Mercure</h1>
-        <p class="lead col-lg-8 mx-auto text-body-secondary">
-            Upload a CSV of first names and see how Symfony processes it in the background.
-            Pick a mode below to compare synchronous processing, async processing without
-            feedback, and real-time progress pushed with Mercure.
-        </p>
-    </div>
+    <h2 class="mm-section-title mb-4">Three ways to import a CSV</h2>
 
     <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h2 class="h4 card-title">Sync</h2>
-                    <p class="card-text text-body-secondary">
-                        The CSV is imported during the HTTP request. The browser waits for
-                        the whole import to finish before getting a response.
-                    </p>
-                    <a href="{{ url('csv_sync') }}" class="btn btn-primary mt-auto">Try it</a>
-                </div>
+        {% for mode in [
+            {
+                caption: 'Blocked until the last row is imported.',
+                kicker: '01 · blocking',
+                lane: 'sync',
+                route: 'csv_sync',
+                text: 'The CSV is imported during the HTTP request. The browser waits for the whole import to finish before getting a response.',
+                title: 'Sync',
+            },
+            {
+                caption: 'Instant response, then silence.',
+                kicker: '02 · fire and forget',
+                lane: 'blind',
+                route: 'csv_async',
+                text: 'The import is dispatched to a background worker. The response is instant, but you have no clue about the progress.',
+                title: 'Async, no feedback',
+            },
+            {
+                caption: 'Instant response, then a live stream.',
+                kicker: '03 · real time',
+                lane: 'live',
+                route: 'csv_async_feedback',
+                text: 'Same as above, but the worker publishes its progress on Mercure, and the page is updated in real time thanks to Turbo streams.',
+                title: 'Async, with feedback',
+            },
+        ] %}
+            <div class="col">
+                <article class="mm-card {{ mode.lane == 'live' ? 'mm-card-live' }}">
+                    <p class="mm-kicker mb-2">{{ mode.kicker }}</p>
+                    <h3 class="mb-3">{{ mode.title }}</h3>
+                    <p class="mb-4">{{ mode.text }}</p>
+                    <div class="mt-auto">
+                        {{ include('csv/_lane.html.twig', {caption: mode.caption, lane: mode.lane}) }}
+                        <a href="{{ path(mode.route) }}" class="btn btn-primary w-100 mt-4">Try it</a>
+                    </div>
+                </article>
             </div>
-        </div>
-
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h2 class="h4 card-title">Async, no feedback</h2>
-                    <p class="card-text text-body-secondary">
-                        The import is dispatched to a background worker. The response is
-                        instant, but you have no clue about the progress.
-                    </p>
-                    <a href="{{ url('csv_async') }}" class="btn btn-primary mt-auto">Try it</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h2 class="h4 card-title">Async, with feedback</h2>
-                    <p class="card-text text-body-secondary">
-                        Same as above, but the worker publishes its progress on Mercure,
-                        and the page is updated in real time thanks to Turbo streams.
-                    </p>
-                    <a href="{{ url('csv_async_feedback') }}" class="btn btn-primary mt-auto">Try it</a>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 
-    <div class="d-flex justify-content-center gap-3 pb-4">
-        <a href="https://github.com/lyrixx/async-messenger-mercure" class="btn btn-outline-secondary" target="_blank" rel="noopener">
-            Demo on GitHub
-        </a>
-        <a href="https://s.lyrixx.info/async" class="btn btn-outline-secondary" target="_blank" rel="noopener">
-            The slides
-        </a>
+    <h2 class="mm-section-title mb-4">The live mode, in three lines</h2>
+
+    <div class="row g-4 align-items-center mb-2">
+        <div class="col-lg-5 d-flex gap-3">
+            <span class="mm-step">1</span>
+            <p class="mb-0"><strong>Dispatch the import.</strong> The controller hands the CSV to Messenger and answers right away.</p>
+        </div>
+        <div class="col-lg-7">
+            <figure class="mm-code">
+                <figcaption>src/Controller/CsvController.php</figcaption>
+                <pre><code>$bus-&gt;<span class="t-fn">dispatch</span>(<span class="t-kw">new</span> CsvUploaded($importId, $content, $sendNotification));</code></pre>
+            </figure>
+        </div>
+
+        <div class="col-lg-5 d-flex gap-3">
+            <span class="mm-step">2</span>
+            <p class="mb-0"><strong>Publish the progress.</strong> Every 100 rows, the worker renders a Turbo Stream and posts it to the hub.</p>
+        </div>
+        <div class="col-lg-7">
+            <figure class="mm-code">
+                <figcaption>src/Csv/CsvImporter.php</figcaption>
+                <pre><code>$this-&gt;mercurePublisher-&gt;<span class="t-fn">publish</span>(<span class="t-kw">new</span> Update(<span class="t-str">"csv:{$importId}"</span>, $content));</code></pre>
+            </figure>
+        </div>
+
+        <div class="col-lg-5 d-flex gap-3">
+            <span class="mm-step">3</span>
+            <p class="mb-0"><strong>Subscribe from the page.</strong> The browser opens an EventSource on the topic, and Turbo applies each update.</p>
+        </div>
+        <div class="col-lg-7">
+            <figure class="mm-code">
+                <figcaption>templates/csv/async.html.twig</figcaption>
+                <pre><code>{% verbatim %}{{ <span class="t-fn">turbo_stream_from</span>(<span class="t-str">'csv:'</span> ~ importId) }}{% endverbatim %}</code></pre>
+            </figure>
+        </div>
     </div>
 {% endblock %}

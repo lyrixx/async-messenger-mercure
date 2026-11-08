@@ -1,0 +1,21 @@
+<section class="mm-band">
+    <div class="container-xl py-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <p class="mm-kicker mb-2">{{ kicker }}</p>
+                <h1 class="mm-page-title mb-3">{{ title }}</h1>
+                <p class="lead mb-4">{{ lead }}</p>
+                {{ include('csv/_lane.html.twig') }}
+            </div>
+            <div class="col-lg-5">
+                <ul class="mm-traits">
+                    {% for trait in traits %}
+                        <li class="{{ trait.pro ? 'is-pro' : 'is-con' }}">
+                            <span><span class="visually-hidden">{{ trait.pro ? 'Pro:' : 'Con:' }}</span> {{ trait.text }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

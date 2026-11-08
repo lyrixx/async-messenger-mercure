@@ -1,17 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% set active = 'sync' %}
+{% block title %}Sync · {{ parent() }}{% endblock %}
 
-{% block title %}Sync{% endblock %}
+{% block band %}
+    {{ include('csv/_band.html.twig', {
+        caption: 'Blocked until the last row is imported.',
+        kicker: 'POST /sync · blocking',
+        lane: 'sync',
+        lead: 'The CSV is imported during the HTTP request. The browser waits for the whole import to finish before getting a response.',
+        title: 'Sync',
+        traits: [
+            {pro: false, text: 'The browser is stuck for the whole import.'},
+            {pro: false, text: 'A server or proxy timeout kills the import.'},
+            {pro: true, text: 'Nothing to run but PHP: no worker, no queue.'},
+        ],
+    }) }}
+{% endblock %}
 
 {% block body %}
-    <div class="text-center py-5">
-        <h1 class="display-5 fw-bold">Sync</h1>
-        <p class="lead col-lg-8 mx-auto text-body-secondary">
-            The CSV is imported during the HTTP request. The browser waits for
-            the whole import to finish before getting a response.
-        </p>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            {{ include('csv/_upload_form.html.twig') }}
+        </div>
+        <div class="col-lg-6">
+            {# Permanent: Turbo keeps the final time on screen when the redirect renders the page again #}
+            <section id="stopwatch" class="mm-panel mm-stopwatch" data-turbo-permanent {{ stimulus_controller('stopwatch')|stimulus_action('stopwatch', 'start', 'submit@document')|stimulus_action('stopwatch', 'stop', 'turbo:submit-end@document') }}>
+                <header class="mm-panel-bar">
+                    <span>Browser</span>
+                    <span class="mm-chip" data-state-label="idle">Idle</span>
+                    <span class="mm-chip" data-state-label="waiting"><span class="mm-pulse" aria-hidden="true"></span>Waiting for the response</span>
+                    <span class="mm-chip" data-state-label="finished">Response received</span>
+                </header>
+                <div class="mm-panel-body mm-panel-empty">
+                    <span class="mm-stopwatch-value"><span {{ stimulus_target('stopwatch', 'elapsed') }}>0.0</span><small>s</small></span>
+                    Time spent waiting for the server
+                </div>
+            </section>
+        </div>
     </div>
-
-    {{ form(form) }}
 {% endblock %}

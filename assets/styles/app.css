@@ -1,0 +1,795 @@
+/*
+ * Theme on top of Bootstrap's dark color mode. The palette and the type pairing are inspired by
+ * https://mercure.rocks.
+ */
+:root[data-bs-theme="dark"] {
+    --mm-accent: #fea668;
+    --mm-accent-rgb: 254, 166, 104;
+    --mm-brand-1: #76c8dd;
+    --mm-brand-2: #2ab3d7;
+    --mm-brand-rgb: 42, 179, 215;
+    --mm-danger: #fa6863;
+    --mm-gradient: linear-gradient(120deg, var(--mm-brand-1), var(--mm-brand-2));
+    --mm-ink: #f2f6f8;
+    --mm-ink-2: #b2b8bd;
+    --mm-ink-3: #8a9398;
+    --mm-line: #60798e40;
+    --mm-line-strong: #60798ebf;
+    --mm-ok: #73ce95;
+    --mm-ok-rgb: 115, 206, 149;
+    --mm-page-600: #1f2a33;
+    --mm-page-800: #111c24;
+    --mm-page-900: #0d171f;
+    --mm-page-950: #050e16;
+
+    --bs-body-bg: var(--mm-page-950);
+    --bs-body-color: var(--mm-ink);
+    --bs-body-font-family: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+    --bs-border-color: var(--mm-line);
+    --bs-border-radius: .625rem;
+    --bs-border-radius-lg: .875rem;
+    --bs-border-radius-sm: .4rem;
+    --bs-code-color: var(--mm-accent);
+    --bs-emphasis-color: var(--mm-ink);
+    --bs-font-monospace: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --bs-form-invalid-border-color: var(--mm-danger);
+    --bs-form-invalid-color: var(--mm-danger);
+    --bs-link-color-rgb: 118, 200, 221;
+    --bs-link-hover-color-rgb: 242, 246, 248;
+    --bs-secondary-color: var(--mm-ink-2);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+main {
+    flex: 1;
+}
+
+::selection {
+    background: var(--mm-brand-2);
+    color: var(--mm-page-950);
+}
+
+:focus-visible {
+    outline: 2px solid var(--mm-brand-1);
+    outline-offset: 2px;
+}
+
+code {
+    font-size: .875em;
+}
+
+.turbo-progress-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--mm-brand-1), var(--mm-accent));
+}
+
+/* Buttons */
+
+.btn {
+    --bs-btn-font-weight: 700;
+    --bs-btn-padding-x: 1.1rem;
+}
+
+.btn-primary {
+    --bs-btn-active-bg: var(--mm-brand-2);
+    --bs-btn-active-color: var(--mm-page-950);
+    --bs-btn-bg: var(--mm-brand-2);
+    --bs-btn-border-color: transparent;
+    --bs-btn-active-border-color: transparent;
+    --bs-btn-color: var(--mm-page-950);
+    --bs-btn-disabled-bg: var(--mm-page-600);
+    --bs-btn-disabled-border-color: transparent;
+    --bs-btn-disabled-color: var(--mm-ink-3);
+    --bs-btn-focus-shadow-rgb: var(--mm-brand-rgb);
+    --bs-btn-hover-bg: var(--mm-brand-1);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-hover-color: var(--mm-page-950);
+}
+
+.btn-primary:not(:disabled) {
+    background-image: var(--mm-gradient);
+}
+
+.btn-primary:not(:disabled):hover {
+    background-image: none;
+}
+
+.btn-accent {
+    --bs-btn-active-bg: #ffb98a;
+    --bs-btn-active-border-color: #ffb98a;
+    --bs-btn-active-color: var(--mm-page-950);
+    --bs-btn-bg: var(--mm-accent);
+    --bs-btn-border-color: var(--mm-accent);
+    --bs-btn-color: var(--mm-page-950);
+    --bs-btn-focus-shadow-rgb: var(--mm-accent-rgb);
+    --bs-btn-hover-bg: #ffb98a;
+    --bs-btn-hover-border-color: #ffb98a;
+    --bs-btn-hover-color: var(--mm-page-950);
+}
+
+.btn-ghost {
+    --bs-btn-active-bg: var(--mm-page-600);
+    --bs-btn-active-border-color: var(--mm-line-strong);
+    --bs-btn-active-color: var(--mm-ink);
+    --bs-btn-border-color: var(--mm-line-strong);
+    --bs-btn-color: var(--mm-ink);
+    --bs-btn-focus-shadow-rgb: var(--mm-brand-rgb);
+    --bs-btn-hover-bg: var(--mm-page-800);
+    --bs-btn-hover-border-color: var(--mm-brand-1);
+    --bs-btn-hover-color: var(--mm-ink);
+}
+
+/* Navbar, flashes and footer */
+
+.mm-navbar {
+    background: rgba(5, 14, 22, .82);
+    border-bottom: 1px solid var(--mm-line);
+    backdrop-filter: blur(12px);
+}
+
+.mm-navbar .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.mm-navbar .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    font-weight: 500;
+}
+
+.mm-navbar .nav-link.active {
+    color: var(--mm-brand-1);
+}
+
+.mm-times {
+    color: var(--mm-accent);
+    font-weight: 500;
+}
+
+.alert-success {
+    --bs-alert-bg: rgba(var(--mm-ok-rgb), .1);
+    --bs-alert-border-color: rgba(var(--mm-ok-rgb), .35);
+    --bs-alert-color: var(--mm-ok);
+}
+
+.mm-footer {
+    border-top: 1px solid var(--mm-line);
+    color: var(--mm-ink-3);
+    font-size: .875rem;
+}
+
+.mm-footer a {
+    color: var(--mm-ink-2);
+}
+
+/* Bands: the hero of the homepage and the header of the demos */
+
+.mm-band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: radial-gradient(60rem 30rem at 80% -10%, rgba(var(--mm-brand-rgb), .22), transparent 70%), var(--mm-page-900);
+    border-bottom: 1px solid var(--mm-line);
+}
+
+/* Concentric rings: a hub broadcasting from the top right corner */
+.mm-band::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: repeating-radial-gradient(circle at 80% 10%, transparent 0 63px, rgba(118, 200, 221, .14) 63px 64px);
+    mask-image: radial-gradient(52rem 30rem at 80% 10%, #000 10%, transparent 80%);
+}
+
+.mm-kicker {
+    color: var(--mm-brand-1);
+    font-family: var(--bs-font-monospace);
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .03em;
+}
+
+.mm-band .lead {
+    color: var(--mm-ink-2);
+}
+
+.mm-hero-title {
+    font-size: clamp(2.75rem, 6vw, 4.75rem);
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: 1;
+}
+
+.mm-page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.1;
+}
+
+.mm-gradient-text {
+    background: var(--mm-gradient);
+    background-clip: text;
+    color: transparent;
+}
+
+.mm-section-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -.025em;
+}
+
+/* Pipeline of the hero */
+
+.mm-pipeline {
+    display: block;
+    width: 100%;
+    max-width: 34rem;
+    height: auto;
+    margin-inline: auto;
+}
+
+.mm-pipeline .edge {
+    fill: none;
+    stroke: var(--mm-line-strong);
+    stroke-width: 1.5;
+}
+
+.mm-pipeline .edge-stream {
+    stroke: rgba(var(--mm-brand-rgb), .7);
+    stroke-dasharray: 1 7;
+    stroke-linecap: round;
+    stroke-width: 2;
+}
+
+.mm-pipeline .node,
+.mm-pipeline .hub {
+    fill: var(--mm-page-800);
+    stroke: var(--mm-line-strong);
+    stroke-width: 1.5;
+}
+
+.mm-pipeline .hub {
+    stroke: var(--mm-brand-2);
+    stroke-width: 2;
+}
+
+.mm-pipeline .ring {
+    fill: none;
+    stroke: var(--mm-brand-2);
+    stroke-width: 1.5;
+}
+
+.mm-pipeline .job {
+    fill: var(--mm-accent);
+}
+
+.mm-pipeline .event {
+    fill: var(--mm-brand-1);
+}
+
+.mm-pipeline .track {
+    fill: var(--mm-page-600);
+}
+
+.mm-pipeline .fill {
+    fill: var(--mm-brand-2);
+}
+
+.mm-pipeline text {
+    fill: var(--mm-ink-2);
+    font-family: var(--bs-font-monospace);
+    font-size: 12.5px;
+    text-anchor: middle;
+}
+
+.mm-pipeline .name {
+    fill: var(--mm-ink);
+    font-family: var(--bs-body-font-family);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.mm-pipeline .static {
+    display: none;
+}
+
+/* Timeline of what the browser sees: the HTTP request, then what comes after */
+
+.mm-lane {
+    display: flex;
+    gap: 4px;
+    height: .625rem;
+}
+
+.mm-lane > span {
+    border-radius: 2px;
+}
+
+.mm-lane > :first-child {
+    flex: 0 0 12%;
+    background: var(--mm-accent);
+}
+
+.mm-lane > :last-child {
+    flex: 1;
+}
+
+.mm-lane-sync > :first-child {
+    flex: 1;
+}
+
+.mm-lane-sync > :last-child {
+    display: none;
+}
+
+.mm-lane-blind > :last-child {
+    align-self: center;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--mm-line-strong) 0 4px, transparent 4px 10px);
+}
+
+.mm-lane-live > :last-child {
+    background: repeating-linear-gradient(90deg, var(--mm-brand-2) 0 3px, transparent 3px 10px);
+    animation: mm-stream 1s linear infinite;
+}
+
+@keyframes mm-stream {
+    to {
+        background-position-x: 10px;
+    }
+}
+
+.mm-lane-caption {
+    margin: .5rem 0 0;
+    color: var(--mm-ink-3);
+    font-family: var(--bs-font-monospace);
+    font-size: .75rem;
+}
+
+/* Cards of the homepage */
+
+.mm-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem;
+    background: var(--mm-page-800);
+    border: 1px solid var(--mm-line);
+    border-radius: 1rem;
+    transition: border-color .15s ease, transform .15s ease;
+}
+
+.mm-card:hover {
+    border-color: var(--mm-line-strong);
+    transform: translateY(-2px);
+}
+
+.mm-card h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.mm-card p {
+    color: var(--mm-ink-2);
+}
+
+.mm-card .mm-lane-caption {
+    color: var(--mm-ink-3);
+}
+
+.mm-card-live {
+    background: linear-gradient(180deg, rgba(var(--mm-brand-rgb), .1), transparent 45%), var(--mm-page-800);
+    border-color: rgba(var(--mm-brand-rgb), .65);
+    box-shadow: 0 24px 60px -32px rgba(var(--mm-brand-rgb), .8);
+}
+
+.mm-card-live:hover {
+    border-color: var(--mm-brand-1);
+}
+
+/* How it works */
+
+.mm-step {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--mm-brand-2);
+    border-radius: 50%;
+    color: var(--mm-brand-1);
+    font-family: var(--bs-font-monospace);
+    font-size: .85rem;
+}
+
+.mm-code {
+    margin: 0;
+    overflow: hidden;
+    background: var(--mm-page-900);
+    border: 1px solid var(--mm-line);
+    border-radius: .75rem;
+}
+
+.mm-code figcaption {
+    padding: .5rem 1rem;
+    border-bottom: 1px solid var(--mm-line);
+    color: var(--mm-ink-3);
+    font-family: var(--bs-font-monospace);
+    font-size: .75rem;
+}
+
+.mm-code pre {
+    margin: 0;
+    padding: 1rem;
+    font-size: .85rem;
+}
+
+.mm-code code {
+    color: var(--mm-ink);
+    font-size: inherit;
+}
+
+.mm-code .t-fn {
+    color: var(--mm-brand-1);
+}
+
+.mm-code .t-kw {
+    color: #c792ea;
+}
+
+.mm-code .t-str {
+    color: var(--mm-accent);
+}
+
+/* Traits of each demo */
+
+.mm-traits {
+    display: grid;
+    gap: .6rem;
+    margin: 0;
+    padding: 1.25rem;
+    list-style: none;
+    background: rgba(5, 14, 22, .55);
+    border: 1px solid var(--mm-line);
+    border-radius: 1rem;
+}
+
+.mm-traits li {
+    display: flex;
+    gap: .6rem;
+}
+
+.mm-traits li::before {
+    flex: none;
+    font-family: var(--bs-font-monospace);
+    font-weight: 500;
+}
+
+.mm-traits .is-pro::before {
+    content: "+";
+    color: var(--mm-ok);
+}
+
+.mm-traits .is-con::before {
+    content: "−";
+    color: var(--mm-danger);
+}
+
+/* Upload form */
+
+.mm-drop {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    min-height: 15rem;
+    padding: 2rem 1.5rem;
+    background: var(--mm-page-800);
+    border: 1.5px dashed var(--mm-line-strong);
+    border-radius: 1rem;
+    text-align: center;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.mm-drop:hover,
+.mm-drop.is-dragging {
+    background: rgba(var(--mm-brand-rgb), .08);
+    border-color: var(--mm-brand-1);
+}
+
+.mm-drop:focus-within {
+    outline: 2px solid var(--mm-brand-1);
+    outline-offset: 2px;
+}
+
+.mm-drop-icon {
+    color: var(--mm-brand-1);
+}
+
+.mm-drop-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.mm-drop-hint {
+    color: var(--mm-ink-3);
+    font-size: .875rem;
+}
+
+.mm-drop-input.form-control {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+
+/* Panels: what the browser sees */
+
+.mm-panel {
+    overflow: hidden;
+    background: var(--mm-page-800);
+    border: 1px solid var(--mm-line);
+    border-radius: 1rem;
+}
+
+.mm-panel-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .6rem 1rem;
+    background: var(--mm-page-900);
+    border-bottom: 1px solid var(--mm-line);
+    color: var(--mm-ink-3);
+    font-family: var(--bs-font-monospace);
+    font-size: .75rem;
+}
+
+.mm-panel-bar code {
+    min-width: 0;
+    color: var(--mm-ink-2);
+    font-size: inherit;
+}
+
+.mm-panel-body {
+    padding: 1.5rem;
+}
+
+.mm-panel-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 12.25rem;
+    margin: 0;
+    color: var(--mm-ink-2);
+    text-align: center;
+}
+
+.mm-chip {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: .4rem;
+    color: var(--mm-ink-2);
+}
+
+.mm-pulse {
+    display: inline-block;
+    flex: none;
+    width: .5rem;
+    height: .5rem;
+    background: var(--mm-brand-2);
+    border-radius: 50%;
+    animation: mm-pulse 1.6s ease-out infinite;
+}
+
+@keyframes mm-pulse {
+    from {
+        box-shadow: 0 0 0 0 rgba(var(--mm-brand-rgb), .7);
+    }
+
+    to {
+        box-shadow: 0 0 0 .55rem rgba(var(--mm-brand-rgb), 0);
+    }
+}
+
+/* Connection to the hub: the <turbo-mercure-stream-source> element carries a "connected" attribute */
+
+.mm-panel .mm-chip-connected,
+.mm-panel:has(turbo-mercure-stream-source[connected]) .mm-chip-connecting {
+    display: none;
+}
+
+.mm-panel:has(turbo-mercure-stream-source[connected]) .mm-chip-connected {
+    display: inline-flex;
+}
+
+.mm-chip-connected {
+    color: var(--mm-brand-1);
+}
+
+/* Progress, rendered by the worker and pushed through Mercure */
+
+.mm-status-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .25rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.mm-status-percent {
+    font-size: 3.5rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.04em;
+    line-height: 1;
+}
+
+.mm-status-percent small {
+    color: var(--mm-ink-3);
+    font-size: .45em;
+}
+
+.mm-status-phrase {
+    color: var(--mm-ink-2);
+    font-family: var(--bs-font-monospace);
+    font-size: .875rem;
+}
+
+.mm-status .progress {
+    --bs-progress-bar-bg: transparent;
+    --bs-progress-bar-transition: width .3s linear;
+    --bs-progress-bg: var(--mm-page-600);
+    --bs-progress-border-radius: 99px;
+    --bs-progress-height: .75rem;
+    overflow: visible;
+}
+
+.mm-status .progress-bar {
+    background-image: var(--mm-gradient);
+    border-radius: 99px;
+    box-shadow: 0 0 18px rgba(var(--mm-brand-rgb), .65);
+}
+
+.mm-status.is-done .mm-status-percent {
+    color: var(--mm-ok);
+}
+
+.mm-status.is-done .progress-bar {
+    background-image: none;
+    background-color: var(--mm-ok);
+    box-shadow: 0 0 18px rgba(var(--mm-ok-rgb), .65);
+}
+
+/* Log of the events received from the hub */
+
+.mm-log {
+    display: flex;
+    flex-direction: column;
+    height: 15rem;
+    margin: 0;
+    padding: .75rem 1rem;
+    overflow: auto;
+    font-family: var(--bs-font-monospace);
+    font-size: .78rem;
+    list-style: none;
+}
+
+.mm-log li {
+    display: flex;
+    flex: none;
+    gap: .75rem;
+    padding-block: .1rem;
+    color: var(--mm-ink-2);
+    animation: mm-log-in .25s ease-out;
+}
+
+.mm-log li:first-child {
+    color: var(--mm-ink);
+}
+
+.mm-log time {
+    flex: none;
+    color: var(--mm-ink-3);
+}
+
+.mm-log-action {
+    flex: none;
+    color: var(--mm-brand-1);
+}
+
+@keyframes mm-log-in {
+    from {
+        background: rgba(var(--mm-brand-rgb), .25);
+    }
+}
+
+/* Stopwatch of the sync demo */
+
+.mm-stopwatch-value {
+    font-size: 4.5rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.04em;
+    line-height: 1;
+}
+
+.mm-stopwatch-value small {
+    color: var(--mm-ink-3);
+    font-size: .4em;
+}
+
+.mm-stopwatch [data-state-label] {
+    display: none;
+}
+
+.mm-stopwatch:not([data-state]) [data-state-label="idle"],
+.mm-stopwatch[data-state="waiting"] [data-state-label="waiting"],
+.mm-stopwatch[data-state="finished"] [data-state-label="finished"] {
+    display: inline-flex;
+}
+
+.mm-stopwatch[data-state="waiting"] .mm-stopwatch-value {
+    color: var(--mm-accent);
+}
+
+.mm-stopwatch[data-state="waiting"] .mm-pulse {
+    background: var(--mm-accent);
+    box-shadow: none;
+    animation: none;
+}
+
+/* Sign that the async demo gives no feedback */
+
+.mm-flatline {
+    width: 100%;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--mm-line-strong) 0 6px, transparent 6px 14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mm-lane-live > :last-child,
+    .mm-log li,
+    .mm-pulse {
+        animation: none;
+    }
+
+    .mm-card,
+    .mm-drop {
+        transition: none;
+    }
+
+    .mm-card:hover {
+        transform: none;
+    }
+
+    .mm-pipeline .moving {
+        display: none;
+    }
+
+    .mm-pipeline .static {
+        display: inline;
+    }
+}

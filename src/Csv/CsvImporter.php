@@ -107,7 +107,7 @@ final readonly class CsvImporter
         }
 
         // There is a header line
-        --$current;
+        $current = max(0, $current - 1);
         --$total;
 
         $percent = $current / $total * 100;

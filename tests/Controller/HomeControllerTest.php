@@ -26,6 +26,18 @@ final class HomeControllerTest extends WebTestCase
         self::assertCount(1, $crawler->filter('a.btn-primary[href$="/async/feedback"]'));
     }
 
+    public function testHomePageDeclaresTheSocialPreviewImage(): void
+    {
+        $client = self::createClient();
+
+        $crawler = $client->request('GET', '/');
+
+        self::assertMatchesRegularExpression(
+            '{^https?://.+/assets/images/social-preview-[^/]+\.png$}',
+            (string) $crawler->filter('meta[property="og:image"]')->attr('content'),
+        );
+    }
+
     public function testHomePageLinksToGithubAndSlides(): void
     {
         $client = self::createClient();

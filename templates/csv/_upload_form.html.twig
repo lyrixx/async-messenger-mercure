@@ -1,0 +1,21 @@
+{{ form_start(form, {attr: {'data-controller': 'upload'}}) }}
+    <label class="mm-drop" data-upload-target="drop">
+        <svg class="mm-drop-icon" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 16V5" />
+            <path d="m7.5 9.5 4.5-4.5 4.5 4.5" />
+            <path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" />
+        </svg>
+        <span class="mm-drop-title" data-upload-target="fileName" data-empty-label="Drop a CSV here, or click to browse">Drop a CSV here, or click to browse</span>
+        <span class="mm-drop-hint">Sample files are in <code>data/</code>, from <code>nat2018-S.csv</code> to <code>nat2018-XL.csv</code>.</span>
+        {{ form_widget(form.csv, {attr: {
+            accept: '.csv,text/csv',
+            class: 'mm-drop-input',
+            'data-action': 'change->upload#pick dragenter->upload#highlight dragleave->upload#unhighlight drop->upload#unhighlight',
+            'data-upload-target': 'input',
+        }}) }}
+    </label>
+    {{ form_errors(form.csv) }}
+    <div class="d-grid mt-3">
+        {{ form_widget(form.send, {attr: {class: 'btn-primary btn-lg'}}) }}
+    </div>
+{{ form_end(form) }}
