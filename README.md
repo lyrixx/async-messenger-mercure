@@ -10,6 +10,29 @@ It's all about async processing with Symfony Messenger and Mercure: upload a
 CSV file, it gets imported in the background by a Messenger worker, and
 progress is pushed live to the browser through Mercure — no polling involved.
 
+## The three modes
+
+### Sync
+
+The CSV is imported during the HTTP request: the browser waits for the whole
+import to finish before getting a response.
+
+![Sync mode: a stopwatch counts the time spent waiting for the server](media/sync.png)
+
+### Async, no feedback
+
+The import is dispatched to a background worker. The response is instant, but
+you have no clue about the progress.
+
+![Async mode without feedback: the page shows no signal from the import](media/async.png)
+
+### Async, with feedback
+
+The worker publishes its progress on Mercure, and the page is updated in real
+time thanks to Turbo streams.
+
+![Async mode with feedback: live progress bar and log of the events received from the hub](media/async-feedback.png)
+
 ## Running the application locally
 
 ### Requirements
@@ -112,7 +135,7 @@ castor stop                    # stop the stack
 castor logs [--service=...]    # tail logs (frontend, worker_messenger, postgres, ...)
 castor pg                      # psql shell on the app database
 castor qa                      # coding standards + static analysis + tests
-castor media                   # regenerate media/home.png, media/demo.webm and media/demo.gif
+castor media                   # regenerate the screenshots, the demo and the social preview image
 ```
 
 Run `castor` with no arguments to list every available task.
@@ -120,8 +143,9 @@ Run `castor` with no arguments to list every available task.
 ### Regenerating the README media
 
 `castor media` drives a real, headless Chromium through the app (via
-[Playwright PHP](https://playwright-php.dev/)) to regenerate `media/home.png`
-and `media/demo.webm`, then converts the video to `media/demo.gif` with
+[Playwright PHP](https://playwright-php.dev/)) to regenerate the screenshots in
+`media/`, `media/demo.webm` and `assets/images/social-preview.png` (the
+`og:image` of the site), then converts the video to `media/demo.gif` with
 `ffmpeg` (GitHub only renders an animated GIF inline in a README when
 referenced by a relative path — a committed video file never plays inline).
 It runs on the host, not in the `builder` container (Castor tasks always do —
